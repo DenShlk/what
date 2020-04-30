@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:activity=".ui.ProjectViewActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/project_view_preview_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="#D5D5D5"
+            android:minHeight="200dp"
+            android:scaleType="centerCrop"
+            android:transitionName="project_preview_image" />
+
+        <views.AnimatedProgressBar
+            android:id="@+id/project_view_progress_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_below="@id/project_view_preview_image"
+            android:progress="0"
+            android:progressBackgroundTint="#80B9F6CA"
+            android:progressTint="#64DD17"
+            android:transitionName="project_progress_bar" />
+
+        <TextView
+            android:id="@+id/card_progress_text"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/project_view_progress_bar"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@+id/project_view_title_text"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="$15/100"
+            android:transitionName="project_progress_text" />
+
+        <TextView
+            android:id="@+id/project_view_title_text"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/project_view_progress_bar"
+            android:layout_marginHorizontal="10dp"
+            android:text="Title"
+            android:transitionName="project_title_text" />
+
+        <TextView
+            android:id="@+id/project_view_description_text"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/project_view_title_text"
+            android:layout_marginHorizontal="10dp"
+            android:text="Description about project can be so long or very long"
+            android:textColor="@color/iconDisabledColor"
+            android:textSize="18sp"
+            android:transitionName="project_description_text" />
+    </RelativeLayout>
+</ScrollView>

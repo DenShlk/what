@@ -1,0 +1,58 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.What" parent="Theme.MaterialComponents.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.What.NoActionBar">
+    </style>
+
+    <style name="Widget.What.TextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:fontFamily">@font/autowide</item>
+    </style>
+
+    <style name="Widget.What.TextView.Logo">
+        <item name="android:textColor">@color/logoColor</item>
+    </style>
+
+    <style name="Widget.What.TextInput.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextColor">@color/textColor</item>
+    </style>
+
+    <style name="Widget.What.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="Widget.What.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="backgroundTint">@color/backgroundColor</item>
+        <item name="elevation">0dp</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="Widget.What.NavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:background">@color/backgroundColor</item>
+        <item name="itemTextColor">@drawable/navigation_bar_selector</item>
+        <item name="itemIconTint">@drawable/navigation_bar_selector</item>
+    </style>
+
+    <style name="Widget.What.TextInputLayout.Profile" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="hintTextColor">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="boxStrokeColor">@color/colorAccent</item>
+    </style>
+
+    <style name="Widget.What.TextInput.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="hintTextColor">@color/textColor</item>
+    </style>
+</resources>
