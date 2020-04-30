@@ -114,7 +114,10 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 			@Override
 			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 				FrameLayout.LayoutParams params = ((FrameLayout.LayoutParams)controlsLayout.getLayoutParams());
-				params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, (int) (slideOffset * relativeLayout.getHeight()));
+				int margin = (int) (slideOffset * relativeLayout.getHeight());
+				if(infoBehaviour.getState() == BottomSheetBehavior.STATE_COLLAPSED)
+					margin+=infoBehaviour.getPeekHeight();
+				params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, margin);
 				controlsLayout.setLayoutParams(params);
 			}
 		});
