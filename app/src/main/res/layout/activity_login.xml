@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Theme.What.NoActionBar"
+    style="@style/Theme.What"
     tools:activity=".ui.LoginActivity"
     android:background="#FFFFFF"
     android:padding="20dp"
@@ -20,6 +20,7 @@
         android:layout_marginBottom="80dp"/>
 
     <LinearLayout
+        android:id="@+id/inputs_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -36,7 +37,7 @@
                 android:id="@+id/login_user_id_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="username, email or phone"
+                android:hint="email"
                 android:inputType="text"
                 />
 
@@ -99,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.What.TextInput.OutlinedBox"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/sign_phone_input"
@@ -152,7 +153,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="6dp"
-                android:text="Log In"/>
+                android:text="Log In"
+                android:onClick="loginClick"/>
         </LinearLayout>
 
         <LinearLayout
@@ -178,7 +180,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:elevation="6dp"
-                android:text="Sign In"/>
+                android:text="Sign Up"
+                android:onClick="signupClick"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -44,7 +44,6 @@
     </FrameLayout>
 
 
-    android:textColor="@color/colorAccent"
     <TextView
         android:id="@+id/marker_title_right"
         style="@style/TextAppearance.MaterialComponents.Body1"

@@ -49,6 +49,24 @@
                     style="@style/Widget.What.TextInput.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:startIconDrawable="@drawable/ic_subject_black_24dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/description_edit_text"
+                        style="@style/TextAppearance.MaterialComponents.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/backgroundColor"
+                        android:hint="Add description"
+                        android:inputType="textMultiLine"
+                        android:paddingEnd="5dp"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.What.TextInput.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:startIconDrawable="@drawable/ic_monetization_on_black_24dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -87,16 +105,19 @@
                     style="@style/Widget.What.TextInput.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/ic_subject_black_24dp">
+                    app:startIconDrawable="@drawable/ic_account_balance_wallet_black_24dp"
+                    app:counterMaxLength="16"
+                    app:counterEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/description_edit_text"
+                        android:id="@+id/money_wallet_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Add description"
-                        android:inputType="textMultiLine"
+                        android:hint="Project Yandex wallet number"
+                        android:inputType="number"
+                        android:maxLines="1"
                         android:paddingEnd="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -123,6 +144,11 @@
                         android:cursorVisible="false"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/progress_step_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
 

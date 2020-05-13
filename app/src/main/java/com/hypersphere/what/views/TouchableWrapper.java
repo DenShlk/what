@@ -1,4 +1,4 @@
-package views;
+package com.hypersphere.what.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

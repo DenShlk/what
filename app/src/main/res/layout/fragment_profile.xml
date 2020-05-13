@@ -23,7 +23,6 @@
                 android:layout_marginTop="150dp"
                 android:background="@color/backgroundColor"
                 android:elevation="0dp"
-                android:gravity="bottom"
                 android:minHeight="500dp"
                 android:orientation="vertical"
                 android:paddingTop="50dp"
@@ -44,7 +43,7 @@
                         style="@style/Widget.What.TextInput.FilledBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="50dp"
+                        android:layout_marginTop="0dp"
                         android:hint="nickname">
 
                         <com.google.android.material.textfield.TextInputEditText
@@ -56,55 +55,6 @@
                             android:inputType="text"
                             android:minWidth="130dp"
                             android:text="nickname"
-                            android:textSize="24sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/profile_email_layout"
-                        style="@style/Widget.What.TextInput.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/profile_nickname_layout"
-                        android:hint="email">
-
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/backgroundColor"
-                            android:drawableLeft="@drawable/ic_mail_outline_black_24dp"
-                            android:drawablePadding="10dp"
-                            android:inputType="textEmailAddress"
-                            android:minWidth="200dp"
-                            android:text="email"
-                            android:textSize="24sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/profile_phone_layout"
-                        style="@style/Widget.What.TextInput.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/profile_nickname_layout"
-                        android:hint="phone">
-
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/backgroundColor"
-                            android:drawableLeft="@drawable/ic_phone_black_24dp"
-                            android:drawablePadding="10dp"
-                            android:inputType="phone"
-                            android:minWidth="200dp"
-                            android:text="phone"
                             android:textSize="24sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -142,11 +92,11 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:id="@+id/circular_image"
+                    android:id="@+id/user_image_view"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_launcher" />
+                    android:src="@drawable/ic_account_circle_gray_24dp" />
             </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

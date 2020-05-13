@@ -6,7 +6,7 @@
     app:startDestination="@id/mainActivity">
     <activity
         android:id="@+id/splashActivity2"
-        android:name="activities.SplashActivity"
+        android:name="com.hypersphere.what.activities.SplashActivity"
         android:label="activity_splash"
         tools:layout="@layout/activity_splash" >
         <action
@@ -18,7 +18,7 @@
     </activity>
     <activity
         android:id="@+id/loginActivity"
-        android:name="activities.LoginActivity"
+        android:name="com.hypersphere.what.activities.LoginActivity"
         android:label="activity_login"
         tools:layout="@layout/activity_login" >
         <action
@@ -27,17 +27,17 @@
     </activity>
     <fragment
         android:id="@+id/profileFragment"
-        android:name="fragments.ProfileFragment"
+        android:name="com.hypersphere.what.fragments.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/googleMapsFragment"
-        android:name="fragments.GoogleMapFragment"
+        android:name="com.hypersphere.what.fragments.GoogleMapFragment"
         android:label="fragment_google_map"
         tools:layout="@layout/fragment_google_map" />
     <activity
         android:id="@+id/mainActivity"
-        android:name="activities.MainActivity"
+        android:name="com.hypersphere.what.activities.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" >
         <action
@@ -52,12 +52,12 @@
     </activity>
     <activity
         android:id="@+id/locationSelectActivity"
-        android:name="activities.LocationSelectActivity"
+        android:name="com.hypersphere.what.activities.LocationSelectActivity"
         android:label="activity_location_select"
         tools:layout="@layout/activity_location_select" />
     <fragment
         android:id="@+id/createProjectFragment"
-        android:name="fragments.CreateProjectFragment"
+        android:name="com.hypersphere.what.fragments.CreateProjectFragment"
         android:label="fragment_create_project"
         tools:layout="@layout/fragment_create_project" >
         <action

@@ -5,13 +5,10 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import views.EditableGalleryRecyclerAdapter;
+import com.hypersphere.what.views.EditableGalleryRecyclerAdapter;
 
 public abstract class OnResultCallbackActivity extends AppCompatActivity {
 
-	public EditableGalleryRecyclerAdapter.ImageViewHolder getWaitForCallback() {
-		return waitForCallback;
-	}
 
 	private EditableGalleryRecyclerAdapter.ImageViewHolder waitForCallback;
 

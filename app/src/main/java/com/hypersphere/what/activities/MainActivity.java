@@ -1,4 +1,4 @@
-package activities;
+package com.hypersphere.what.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -12,15 +12,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.hypersphere.what.OnResultCallbackActivity;
 import com.hypersphere.what.R;
+import com.hypersphere.what.fragments.CreateProjectFragment;
+import com.hypersphere.what.fragments.FeedFragment;
+import com.hypersphere.what.fragments.GoogleMapFragment;
+import com.hypersphere.what.fragments.ProfileFragment;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import fragments.CreateProjectFragment;
-import fragments.GoogleMapFragment;
-import fragments.ProfileFragment;
 
 public class MainActivity extends OnResultCallbackActivity implements NavigationHost {
 
@@ -42,14 +42,17 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		Button menuMapButton = findViewById(R.id.menu_map_button);
 		Button menuCreateButton = findViewById(R.id.menu_create_button);
 		Button menuProfileButton = findViewById(R.id.menu_profile_button);
-		menuButtons = Arrays.asList(menuMapButton, menuCreateButton, menuProfileButton);
+		Button menuFeedButton = findViewById(R.id.menu_feed_button);
+		menuButtons = Arrays.asList(menuMapButton, menuFeedButton, menuCreateButton, menuProfileButton);
 
 		menuMap.put(menuMapButton, new GoogleMapFragment());
 		menuOrder.put(menuMapButton, 1);
+		menuMap.put(menuFeedButton, new FeedFragment());
+		menuOrder.put(menuFeedButton, 2);
 		menuMap.put(menuCreateButton, new CreateProjectFragment());
-		menuOrder.put(menuCreateButton, 2);
+		menuOrder.put(menuCreateButton, 3);
 		menuMap.put(menuProfileButton, new ProfileFragment(null));
-		menuOrder.put(menuProfileButton, 3);
+		menuOrder.put(menuProfileButton, 4);
 
 		View.OnClickListener menuOnClick = new View.OnClickListener() {
 			@Override
@@ -68,6 +71,7 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		};
 
 		menuMapButton.setOnClickListener(menuOnClick);
+		menuFeedButton.setOnClickListener(menuOnClick);
 		menuCreateButton.setOnClickListener(menuOnClick);
 		menuProfileButton.setOnClickListener(menuOnClick);
 
@@ -77,12 +81,13 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 				toolbar,
 				new AccelerateDecelerateInterpolator(),
 				getDrawable(R.drawable.ic_menu_black_24dp),
-				getDrawable(R.drawable.ic_close_gray_24dp));
+				getDrawable(R.drawable.ic_close_black_24dp));
 
 		setSupportActionBar(toolbar);
 		toolbar.setNavigationOnClickListener(menuController);
 
 		menuMapButton.callOnClick();
+		//menuFeedButton.callOnClick();
 		//menuCreateButton.callOnClick();
 		//menuProfileButton.callOnClick();
 	}

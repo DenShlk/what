@@ -23,7 +23,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.What">
-        <activity android:name="activities.LocationSelectActivity">
+        <activity android:name="com.hypersphere.what.activities.LocationSelectActivity">
 
         </activity>
         <!--
@@ -39,7 +39,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="activities.MainActivity">
+            android:name="com.hypersphere.what.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,11 +47,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="activities.ProjectViewActivity" />
+            android:name="com.hypersphere.what.activities.ProjectViewActivity" />
         <activity
-            android:name="activities.LoginActivity" />
+            android:name="com.hypersphere.what.activities.LoginActivity" >
+        </activity>
         <activity
-            android:name="activities.SplashActivity">
+            android:name="com.hypersphere.what.activities.SplashActivity">
 
         </activity>
     </application>

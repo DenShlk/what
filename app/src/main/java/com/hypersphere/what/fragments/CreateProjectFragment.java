@@ -1,4 +1,4 @@
-package fragments;
+package com.hypersphere.what.fragments;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -20,14 +20,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.OnResultCallbackActivity;
-import com.hypersphere.what.ProjectEntry;
 import com.hypersphere.what.R;
+import com.hypersphere.what.activities.LocationSelectActivity;
+import com.hypersphere.what.model.ProjectEntry;
+import com.hypersphere.what.views.EditableGalleryRecyclerAdapter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
-
-import activities.LocationSelectActivity;
-import views.EditableGalleryRecyclerAdapter;
 
 
 public class CreateProjectFragment extends Fragment {
@@ -68,6 +67,7 @@ public class CreateProjectFragment extends Fragment {
 		final TextInputEditText descriptionInput = mView.findViewById(R.id.description_edit_text);
 		final TextInputEditText moneyGoalInput = mView.findViewById(R.id.money_goal_edit_text);
 		final TextInputEditText moneyInvestInput = mView.findViewById(R.id.money_investment_edit_text);
+		final TextInputEditText moneyWalletInput = mView.findViewById(R.id.money_wallet_edit_text);
 
 
 		locationInput = mView.findViewById(R.id.location_edit_text);
@@ -107,17 +107,21 @@ public class CreateProjectFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				ProjectEntry project = new ProjectEntry(
+						"",
 						titleInput.getText().toString(),
 						descriptionInput.getText().toString(),
 						Double.parseDouble(moneyGoalInput.getText().toString()),
 						Double.parseDouble(moneyInvestInput.getText().toString()),
 						latitude,
 						longitude,
-						null
+						null,
+						null,
+						CloudManager.getCurUser().id,
+						moneyWalletInput.getText().toString()
 				);
 
 
-				final Dialog loadingDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+				final Dialog loadingDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent);
 				loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				loadingDialog.setCancelable(false);
 				loadingDialog.setContentView(R.layout.loading_dialog_layout);
@@ -130,12 +134,14 @@ public class CreateProjectFragment extends Fragment {
 
 				loadingDialog.show();
 
-				CloudManager.startIfNeed();
 				CloudManager.newProject(project, galleryAdapter.getImages(), new CloudManager.OnUploadListener() {
 					@Override
 					public void onComplete() {
 						loadingDialog.dismiss();
 					}
+
+					@Override
+					public void onCancel() {}
 				});
 			}
 		});

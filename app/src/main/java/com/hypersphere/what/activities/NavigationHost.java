@@ -1,10 +1,10 @@
-package activities;
+package com.hypersphere.what.activities;
 
 import androidx.fragment.app.Fragment;
 
 /**
  * [from google codelabs 101-104]
- * A host (typically an {@code Activity}} that can display fragments and knows how to respond to
+ * A host (typically an {@code Activity}} that can display com.hypersphere.what.fragments and knows how to respond to
  * navigation events.
  */
 public interface NavigationHost {

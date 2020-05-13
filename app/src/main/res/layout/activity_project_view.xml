@@ -19,7 +19,7 @@
             android:scaleType="centerCrop"
             android:transitionName="project_preview_image" />
 
-        <views.AnimatedProgressBar
+        <com.hypersphere.what.views.AnimatedProgressBar
             android:id="@+id/project_view_progress_bar"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"

@@ -1,5 +1,7 @@
 package com.hypersphere.what;
 
+import com.hypersphere.what.model.ProjectEntry;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;

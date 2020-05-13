@@ -13,4 +13,7 @@
 
     <color name="progressColor">#64DD17</color>
     <color name="progressBarBackgroundColor">#E0FF9B</color>
+
+    <color name="colorComplete">#43A047</color>
+    <color name="colorNotComplete">#AAAAAA</color>
 </resources>

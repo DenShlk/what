@@ -9,11 +9,18 @@
         <item name="android:textColor">@color/textColor</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
-        <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="materialAlertDialogTheme">@style/Widget.What.MaterialAlertDialog</item>
     </style>
 
-    <style name="Theme.What.NoActionBar">
+    <style name="Widget.What.MaterialAlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">
+        <item name="android:buttonBarPositiveButtonStyle">@style/Widget.What.PositiveButton</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.What.PositiveButton</item>
+    </style>
+
+    <style name="Widget.What.PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
     </style>
 
     <style name="Widget.What.TextView" parent="Widget.MaterialComponents.TextView">

@@ -1,4 +1,4 @@
-package activities;
+package com.hypersphere.what.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -31,11 +31,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.hypersphere.what.R;
+import com.hypersphere.what.views.TouchableWrapper;
 
 import java.io.IOException;
 import java.util.List;
-
-import views.TouchableWrapper;
 
 public class LocationSelectActivity extends AppCompatActivity implements OnMapReadyCallback {
 

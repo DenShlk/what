@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="bottom"
+    android:gravity="bottom"
     android:theme="@style/Theme.What">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,8 +27,8 @@
                 android:id="@+id/controls_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="end">
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp">
 
                 <LinearLayout
                     android:id="@+id/linearLayout"
@@ -86,41 +88,52 @@
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="30dp"
+        app:behavior_peekHeight="55dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/info_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
+            android:layout_marginBottom="-10dp"
+            android:clickable="false"
             android:elevation="0dp"
             app:cardCornerRadius="10dp"
             app:cardElevation="10dp"
-            app:contentPadding="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/drag_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_alignParentTop="true">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="5dp"
+                        android:layout_centerHorizontal="true"
+                        android:backgroundTint="@color/grayIconColor"
+                        android:elevation="0dp"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintWidth_percent="0.125" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <FrameLayout
                     android:id="@+id/info_frame"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/info_donate_button"
-                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/info_frame"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginHorizontal="50dp"
-                    android:layout_marginTop="25dp"
-                    android:text="Donate!"
-                    android:textColor="@color/textColor"
-                    app:cornerRadius="20dp" />
+                    android:layout_below="@id/drag_view" />
 
             </RelativeLayout>
 

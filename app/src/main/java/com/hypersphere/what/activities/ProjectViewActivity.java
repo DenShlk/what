@@ -1,4 +1,4 @@
-package activities;
+package com.hypersphere.what.activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -8,11 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.hypersphere.what.ImageRequester;
-import com.hypersphere.what.ProjectEntry;
 import com.hypersphere.what.R;
 import com.hypersphere.what.Utils;
-
-import views.AnimatedProgressBar;
+import com.hypersphere.what.model.ProjectEntry;
+import com.hypersphere.what.views.AnimatedProgressBar;
 
 public class ProjectViewActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package fragments;
+package com.hypersphere.what.fragments;
 
 
 import android.Manifest;
@@ -38,11 +38,10 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.hypersphere.what.CloudManager;
-import com.hypersphere.what.ProjectEntry;
 import com.hypersphere.what.R;
+import com.hypersphere.what.model.ProjectEntry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +72,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 	private List<ProjectEntry> projects;
 
-	private MaterialButton donateButton;
 	private ProjectInfoFragment infoFragment;
 
 	private BottomSheetBehavior<RelativeLayout> infoBehaviour;
@@ -84,7 +82,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		mView = inflater.inflate(R.layout.fragment_google_map, container, false);
 
@@ -96,8 +94,16 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 		infoFragment = new ProjectInfoFragment();
 
+		infoFragment.setCloseListener(new ProjectInfoFragment.CloseListener() {
+			@Override
+			public void onClose() {
+				focusedOnMarker = false;
+				infoBehaviour.setHideable(true);
+				infoBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
+			}
+		});
+
 		infoCard = mView.findViewById(R.id.info_card);
-		donateButton = mView.findViewById(R.id.info_donate_button);
 
 		getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.info_frame, infoFragment).commit();
 
@@ -108,15 +114,15 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		infoBehaviour.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
 			@Override
 			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
 			}
 
 			@Override
 			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 				FrameLayout.LayoutParams params = ((FrameLayout.LayoutParams)controlsLayout.getLayoutParams());
-				int margin = (int) (slideOffset * relativeLayout.getHeight());
-				if(infoBehaviour.getState() == BottomSheetBehavior.STATE_COLLAPSED)
-					margin+=infoBehaviour.getPeekHeight();
+				int margin = (int) (slideOffset * relativeLayout.getHeight() + (1 - slideOffset) * infoBehaviour.getPeekHeight());
+				//if(infoBehaviour.getState() == BottomSheetBehavior.STATE_COLLAPSED)
+				if(margin < 0)
+					margin = 0;
 				params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, margin);
 				controlsLayout.setLayoutParams(params);
 			}
@@ -243,7 +249,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 			setUpMap();
 
 
-		CloudManager.startIfNeed();
 		CloudManager.loadProjects(new CloudManager.OnDownloadListener<List<ProjectEntry>>() {
 			@Override
 			public void onComplete(List<ProjectEntry> data) {
@@ -252,6 +257,9 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 					addProjectMarker(project);
 				}
 			}
+
+			@Override
+			public void onCancel() {}
 		});
 
 		googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -260,7 +268,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 				// TODO: 27.04.2020
 				//load info from marker from project
 
-				ProjectEntry project = markerProjectMap.get(marker);
+				final ProjectEntry project = markerProjectMap.get(marker);
 				infoFragment.fillInfo(project);
 
 				if(!focusedOnMarker)
@@ -293,10 +301,13 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 	private void changeFocusedOnMarker(){
 		focusedOnMarker = !focusedOnMarker;
+
 		if(focusedOnMarker) {
-			infoBehaviour.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+			if(infoBehaviour.getState()==BottomSheetBehavior.STATE_HIDDEN)
+				infoBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
 			infoBehaviour.setHideable(false);
-			donateButton.setTranslationY(infoBehaviour.getExpandedOffset());
+			infoBehaviour.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+			//donateButton.setTranslationY(infoBehaviour.getExpandedOffset());
 			//bottomPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
 		}else {
 			infoBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -358,10 +369,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		float maxHeight = displayMetrics.density * 40;
 		progressView.getLayoutParams().height = (int) (maxHeight * (1 - project.donationsCollected / project.donationsGoal));
 		progressView.requestLayout();
-
-		//ProgressBar projectProgress = markerView.findViewById(R.id.marker_progress);
-		//projectProgress.setMax((int) (project.donationsGoal * 100));
-		//projectProgress.setProgress((int) (project.donationsCollected * 100));
 
 		TextView titleTextLeft = markerView.findViewById(R.id.marker_title_left);
 		titleTextLeft.setText(project.title);

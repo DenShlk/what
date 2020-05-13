@@ -1,19 +1,22 @@
-package activities;
+package com.hypersphere.what.activities;
 
+import android.animation.TimeInterpolator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -26,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 	Animation toLeft, toRight, fromLeft, fromRight;
 
 	TextInputLayout loginUserId, loginPassword, signUsername, signPassword, signEmail, signPhone;
-	LinearLayout loginButtons, signButtons;
+	LinearLayout loginButtons, signButtons, mainLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
 
 		loginButtons = findViewById(R.id.login_buttons_layout);
 		signButtons = findViewById(R.id.sign_buttons_layout);
+		mainLayout = findViewById(R.id.inputs_layout);
 
 		toLeft = AnimationUtils.loadAnimation(this, R.anim.to_left_animation);
 		toRight = AnimationUtils.loadAnimation(this, R.anim.to_right_animation);
@@ -52,24 +56,108 @@ public class LoginActivity extends AppCompatActivity {
 		fromLeft.setInterpolator(new DecelerateInterpolator());
 		fromRight.setInterpolator(new DecelerateInterpolator());
 
-		final MaterialButton loginButton = findViewById(R.id.login_login_button);
-		loginButton.setOnClickListener(new View.OnClickListener() {
+		loginUserId.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public void onClick(View v) {
-				loginButton.setClickable(false);
-				startActivity(new Intent(LoginActivity.this, MainActivity.class));
-				finish();
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				String email = v.getText().toString();
+				if (!checkEmail(email))
+					loginUserId.setError("Email invalid");
+				else
+					loginUserId.setError("");
+				return false;
 			}
 		});
-		final MaterialButton signButton = findViewById(R.id.login_sign_button);
-		signButton.setOnClickListener(new View.OnClickListener() {
+		loginPassword.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
-			public void onClick(View v) {
-				signButton.setClickable(false);
-				startActivity(new Intent(LoginActivity.this, MainActivity.class));
-				finish();
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				String password = v.getText().toString();
+				if (checkPassword(password))
+					loginUserId.setError("At least 6 characters");
+				else
+					loginUserId.setError("");
+				return false;
 			}
 		});
+	}
+
+	boolean checkEmail(String email) {
+		return email.matches(".+@.+\\..+");
+	}
+
+	boolean checkPassword(String password) {
+		return password.length() >= 6;
+	}
+
+	public void loginClick(View v) {
+		String email = loginUserId.getEditText().getText().toString();
+		String password = loginPassword.getEditText().getText().toString();
+
+		if (checkEmail(email) && checkPassword(password))
+			CloudManager.login(email, password, new CloudManager.OnAuthListener() {
+				@Override
+				public void onSuccess() {
+					navigateToMain();
+				}
+
+				@Override
+				public void onError() {
+					errorAnimate();
+				}
+			});
+
+		else {
+			errorAnimate();
+		}
+	}
+
+	public void signupClick(View v) {
+		String username = signUsername.getEditText().getText().toString();
+		String email = signEmail.getEditText().getText().toString();
+		String password = signPassword.getEditText().getText().toString();
+
+
+		if (checkEmail(email) && checkPassword(password)) {
+			CloudManager.sign(username, email, password, new CloudManager.OnAuthListener() {
+				@Override
+				public void onSuccess() {
+					navigateToMain();
+				}
+
+				@Override
+				public void onError() {
+					errorAnimate();
+				}
+			});
+
+		} else
+			errorAnimate();
+	}
+
+	private void navigateToMain() {
+		Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+		startActivity(intent);
+		finish();
+	}
+
+	private void errorAnimate() {
+		final float FREQ = 1.6f;
+		final float DECAY = 1.1f;
+		// interpolator that goes 1 -> -1 -> 1 -> -1 in a sine wave pattern.
+		TimeInterpolator decayingSineWave = new TimeInterpolator() {
+			@Override
+			public float getInterpolation(float input) {
+				double raw = Math.sin(FREQ * input * 2 * Math.PI);
+				return (float) (raw * Math.exp(-input * DECAY));
+			}
+		};
+
+		mainLayout.clearAnimation();
+		mainLayout.setTranslationX(0);
+		mainLayout.animate()
+				.translationXBy(-50)
+				.setInterpolator(decayingSineWave)
+				.setDuration(500)
+				.start();
 	}
 
 	public void newUserClick(View view) {
@@ -87,7 +175,7 @@ public class LoginActivity extends AppCompatActivity {
 
 				signUsername.setVisibility(View.VISIBLE);
 				signEmail.setVisibility(View.VISIBLE);
-				signPhone.setVisibility(View.VISIBLE);
+				//signPhone.setVisibility(View.VISIBLE);
 				signPassword.setVisibility(View.VISIBLE);
 				signButtons.setVisibility(View.VISIBLE);
 				signUsername.startAnimation(fromRight);

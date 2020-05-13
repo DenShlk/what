@@ -47,12 +47,21 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.70" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/vertical_gd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.80" />
+
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/vertical_gd"
             app:layout_constraintEnd_toStartOf="@id/horizontal_gd"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <Button
                 android:id="@+id/menu_map_button"
@@ -60,8 +69,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="100dp"
                 android:text="map"
+                android:textColor="#000"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/menu_feed_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="feed"
                 android:textColor="#000"
                 android:textSize="15sp" />
 

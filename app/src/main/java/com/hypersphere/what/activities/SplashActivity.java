@@ -1,4 +1,4 @@
-package activities;
+package com.hypersphere.what.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
 
 public class SplashActivity extends AppCompatActivity {
@@ -24,11 +25,18 @@ public class SplashActivity extends AppCompatActivity {
 
 	Handler timer = new Handler();
 
+	Intent nextActivity;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_splash);
+
+		if (CloudManager.isLoginNeed())
+			nextActivity = new Intent(SplashActivity.this, LoginActivity.class);
+		else
+			nextActivity = new Intent(SplashActivity.this, MainActivity.class);
 
 		//animations
 		topAnim = AnimationUtils.loadAnimation(this, R.anim.from_top_animation);
@@ -53,11 +61,11 @@ public class SplashActivity extends AppCompatActivity {
 		}, SPLASH_DURATION);
 	}
 
-	public void onSplashClick(View view){
+	public void onSplashClick(View view) {
 		view.setEnabled(false);
 		timer.removeCallbacksAndMessages(null);
-		Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-		startActivity(intent);
+
+		startActivity(nextActivity);
 		finish();
 	}
 }

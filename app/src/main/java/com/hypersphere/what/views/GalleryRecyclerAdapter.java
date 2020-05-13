@@ -1,4 +1,4 @@
-package views;
+package com.hypersphere.what.views;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -94,7 +94,7 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 			imageView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+					final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent);
 					showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 					showDialog.setCancelable(true);
 					showDialog.setContentView(R.layout.image_viewer_layout);
