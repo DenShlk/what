@@ -10,7 +10,7 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <TextView
-        style="@style/Widget.What.TextView.Logo"
+        style="@style/Widget.What.TextView.CustomFont.Logo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_name"

@@ -1,5 +1,6 @@
 package com.hypersphere.what.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -10,12 +11,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.OnResultCallbackActivity;
 import com.hypersphere.what.R;
 import com.hypersphere.what.fragments.CreateProjectFragment;
 import com.hypersphere.what.fragments.FeedFragment;
 import com.hypersphere.what.fragments.GoogleMapFragment;
 import com.hypersphere.what.fragments.ProfileFragment;
+import com.hypersphere.what.model.ProjectEntry;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,7 +54,7 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		menuOrder.put(menuFeedButton, 2);
 		menuMap.put(menuCreateButton, new CreateProjectFragment());
 		menuOrder.put(menuCreateButton, 3);
-		menuMap.put(menuProfileButton, new ProfileFragment(null));
+		menuMap.put(menuProfileButton, new ProfileFragment());
 		menuOrder.put(menuProfileButton, 4);
 
 		View.OnClickListener menuOnClick = new View.OnClickListener() {
@@ -90,6 +93,24 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		//menuFeedButton.callOnClick();
 		//menuCreateButton.callOnClick();
 		//menuProfileButton.callOnClick();
+
+		CloudManager.listenProjectDone(new CloudManager.OnProjectDoneListener() {
+			@Override
+			public void onProjectDone(String projectId) {
+				CloudManager.loadProjectDone(projectId, new CloudManager.OnDownloadListener<ProjectEntry>() {
+					@Override
+					public void onComplete(ProjectEntry data) {
+						// TODO: 14.05.2020 move to finished 
+						Intent intent = new Intent(MainActivity.this, ProjectDoneActivity.class);
+						intent.putExtra("projectName", data.title);
+						startActivity(intent);
+					}
+
+					@Override
+					public void onCancel() {}
+				});
+			}
+		});
 	}
 
 	@Override

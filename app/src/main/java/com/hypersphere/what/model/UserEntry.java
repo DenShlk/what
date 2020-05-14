@@ -9,7 +9,7 @@ public class UserEntry {
 	public String id;
 	public String image;
 
-	public UserEntry(String email, String username, List<String> myProjects, String id, String image) {
+	public UserEntry(String username, String email, List<String> myProjects, String id, String image) {
 		this.email = email;
 		this.username = username;
 		this.myProjects = myProjects;

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        app:cardElevation="2dp"
+        app:contentPadding="8dp"
+        app:cardCornerRadius="5dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/materialCardView"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:elevation="0dp"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/comment_author_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_account_circle_gray_24dp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/comment_author_name"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:text="Username"
+                app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/materialCardView"
+                app:layout_constraintTop_toTopOf="@+id/materialCardView" />
+
+            <TextView
+                style="@style/TextAppearance.MaterialComponents.Body1"
+                android:id="@+id/comment_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="It is really exiting comment! You should read it several times."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/materialCardView"
+                app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

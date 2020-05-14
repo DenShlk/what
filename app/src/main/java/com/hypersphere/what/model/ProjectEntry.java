@@ -18,13 +18,11 @@ public class ProjectEntry implements Serializable {
 
 	public List<String> images;
 
-	public List<ProgressStepEntry> steps;
-
 	public String creatorId;
 
 	public String walletId;
 
-	public ProjectEntry(String id, String title, String description, double donationsGoal, double donationsCollected, double latitude, double longitude, List<String> images, List<ProgressStepEntry> steps, String creatorId, String walletId) {
+	public ProjectEntry(String id, String title, String description, double donationsGoal, double donationsCollected, double latitude, double longitude, List<String> images, String creatorId, String walletId) {
 		this.title = title;
 		this.description = description;
 		this.donationsGoal = donationsGoal;
@@ -32,7 +30,6 @@ public class ProjectEntry implements Serializable {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.images = images;
-		this.steps = steps;
 		this.creatorId = creatorId;
 		this.walletId = walletId;
 	}

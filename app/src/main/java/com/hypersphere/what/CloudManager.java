@@ -19,6 +19,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.hypersphere.what.model.CommentEntry;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.model.UserEntry;
 
@@ -35,10 +36,8 @@ import java.util.UUID;
 
 public class CloudManager {
 
-	private static final String YANDEX_WALLET_API_KEY = "6BC6EB098D661CCA8771C67A3141A63588E3D6CD7E8457A9815E891B7D3CDF8F";
-
 	private static FirebaseDatabase database;
-	private static DatabaseReference projectsRef, usersRef;
+	private static DatabaseReference projectsRef, usersRef, commentsRef, projectsDoneNotificationRef, projectsDoneRef;
 
 	private static StorageReference storage;
 	private static StorageReference images;
@@ -47,10 +46,14 @@ public class CloudManager {
 
 	private static boolean userLoading = false;
 
+	private static OnDownloadListener<UserEntry> userDownloadListener;
+
 	private static final int MAX_IMAGE_SIZE = 1000 * 1000;
 	private static Map<String, Bitmap> imageCash = new HashMap<>();
 
 	private static UserEntry curUser;
+	
+	private static Gson gson = new Gson();
 
 	private static void start() {
 		if(!userLoading && curUser==null && firebaseAuth.getCurrentUser()!=null) {
@@ -58,6 +61,9 @@ public class CloudManager {
 				@Override
 				public void onComplete(UserEntry data) {
 					curUser = data;
+					if(userDownloadListener != null)
+						userDownloadListener.onComplete(curUser);
+					userDownloadListener = null;
 				}
 
 				@Override
@@ -68,9 +74,16 @@ public class CloudManager {
 		database = FirebaseDatabase.getInstance();
 		projectsRef = database.getReference("projects");
 		usersRef = database.getReference("users");
+		commentsRef = database.getReference("comments");
+		projectsDoneRef = database.getReference("projects-done");
+		projectsDoneNotificationRef = database.getReference("projects-done-notifications");
 
 		storage = FirebaseStorage.getInstance().getReference();
 		images = storage.child("images");
+	}
+
+	public static void setUserDownloadListener(OnDownloadListener<UserEntry> userDownloadListener) {
+		CloudManager.userDownloadListener = userDownloadListener;
 	}
 
 	public static void newProject(ProjectEntry project, List<Bitmap> images, final OnUploadListener listener) {
@@ -126,6 +139,7 @@ public class CloudManager {
 
 	public static void sign(final String username, final String email, String password, final OnAuthListener listener) {
 		start();
+
 		firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 			@Override
 			public void onComplete(@NonNull Task<AuthResult> task) {
@@ -141,7 +155,8 @@ public class CloudManager {
 	}
 
 	public static void updateCurUser(){
-		Gson gson = new Gson();
+		start();
+
 		String userData = gson.toJson(getCurUser(), UserEntry.class);
 		usersRef.child(firebaseAuth.getCurrentUser().getUid()).setValue(userData);
 	}
@@ -202,7 +217,7 @@ public class CloudManager {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				userLoading = false;
-				Gson gson = new Gson();
+				
 				listener.onComplete(gson.fromJson(dataSnapshot.getValue(String.class), UserEntry.class));
 			}
 
@@ -238,7 +253,6 @@ public class CloudManager {
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				List<ProjectEntry> projects = new ArrayList<>();
 				for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-					Gson gson = new Gson();
 					projects.add(gson.fromJson(snapshot.getValue(String.class), ProjectEntry.class));
 				}
 				listener.onComplete(projects);
@@ -247,21 +261,161 @@ public class CloudManager {
 			@Override
 			public void onCancelled(@NonNull DatabaseError databaseError) {
 				Log.e(getClass().getName(), databaseError.getMessage());
-				loadProjects(listener);
+				listener.onCancel();
+			}
+		});
+	}
+
+	public static void loadProjectsDone(final OnDownloadListener<List<ProjectEntry>> listener) {
+		start();
+
+		projectsDoneRef.child(curUser.id).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+				List<ProjectEntry> projects = new ArrayList<>();
+				for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+					projects.add(gson.fromJson(snapshot.getValue(String.class), ProjectEntry.class));
+				}
+				listener.onComplete(projects);
+			}
+
+			@Override
+			public void onCancelled(@NonNull DatabaseError databaseError) {
+				Log.e(getClass().getName(), databaseError.getMessage());
+				listener.onCancel();
+			}
+		});
+	}
+
+	public static void loadProject(String projectId, OnDownloadListener<ProjectEntry> listener){
+		start();
+
+		projectsRef.child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+				listener.onComplete(gson.fromJson(dataSnapshot.getValue(String.class), ProjectEntry.class));
+			}
+
+			@Override
+			public void onCancelled(@NonNull DatabaseError databaseError) {
+				databaseError.toException().printStackTrace();
+				listener.onCancel();
+			}
+		});
+	}
+
+	public static void loadProjectDone(String projectId, OnDownloadListener<ProjectEntry> listener){
+		start();
+
+		projectsDoneRef.child(curUser.id).child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+				listener.onComplete(gson.fromJson(dataSnapshot.getValue(String.class), ProjectEntry.class));
+			}
+
+			@Override
+			public void onCancelled(@NonNull DatabaseError databaseError) {
+				databaseError.toException().printStackTrace();
+				listener.onCancel();
 			}
 		});
 	}
 
 	public static UserEntry getCurUser() {
+		start();
+
 		return curUser;
 	}
 
 	public static ProjectEntry notifyDonation(ProjectEntry project, double payAmount) {
+		start();
+
 		project.donationsCollected += payAmount;
-		// TODO: 14.05.2020 project finished
-		Gson gson = new Gson();
+		
 		projectsRef.child(project.id).setValue(gson.toJson(project));
+
+		// TODO: 14.05.2020 think about it
+		if (project.donationsCollected - 0.1 >= project.donationsGoal){
+			finishProject(project);
+		}
+
 		return project;
+	}
+
+	public static void finishProject(ProjectEntry project){
+		start();
+
+		getUser(project.creatorId, new OnDownloadListener<UserEntry>() {
+			@Override
+			public void onComplete(UserEntry data) {
+
+				projectsRef.child(project.id).removeValue();
+				projectsDoneRef.child(project.creatorId).child(project.id).setValue(gson.toJson(project)).addOnCompleteListener(new OnCompleteListener<Void>() {
+					@Override
+					public void onComplete(@NonNull Task<Void> task) {
+						projectsDoneNotificationRef.child(data.id).push().setValue(project.id);
+					}
+				});
+			}
+
+			@Override
+			public void onCancel() {}
+		});
+	}
+
+	public static void newComment(CommentEntry comment) {
+		start();
+		
+		String data = gson.toJson(comment);
+		commentsRef.child(comment.projectId).push().setValue(data);
+	}
+
+	public static void loadComments(String projectId, OnDownloadListener<List<CommentEntry>> listener){
+		start();
+
+		commentsRef.child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+				List<CommentEntry> list = new ArrayList<>();
+				
+				for(DataSnapshot commentData : dataSnapshot.getChildren()){
+					list.add(gson.fromJson(commentData.getValue(String.class), CommentEntry.class));
+				}
+				listener.onComplete(list);
+			}
+
+			@Override
+			public void onCancelled(@NonNull DatabaseError databaseError) {
+				listener.onCancel();
+				databaseError.toException().printStackTrace();
+			}
+		});
+	}
+
+	public static void listenProjectDone(OnProjectDoneListener listener){
+		start();
+
+		projectsDoneNotificationRef.child(curUser.id).addValueEventListener(new ValueEventListener() {
+			@Override
+			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+				if(dataSnapshot.getChildrenCount() > 0) {
+					for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+						String projectDoneId = (String) snapshot.getValue();
+						listener.onProjectDone(projectDoneId);
+					}
+					projectsDoneNotificationRef.child(curUser.id).removeValue();
+				}
+			}
+
+			@Override
+			public void onCancelled(@NonNull DatabaseError databaseError) {
+				databaseError.toException().printStackTrace();
+			}
+		});
+	}
+
+	public interface OnProjectDoneListener {
+		void onProjectDone(String projectId);
 	}
 
 	public interface OnAuthListener {
@@ -282,3 +436,4 @@ public class CloudManager {
 		void onCancel();
 	}
 }
+

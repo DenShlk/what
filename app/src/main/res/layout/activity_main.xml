@@ -25,8 +25,10 @@
             android:paddingStart="0dp"
             android:paddingEnd="12dp"
             app:contentInsetStart="0dp"
+            app:titleTextAppearance="@style/TextAppearance.What.Headline.CustomFont"
             app:navigationIcon="@drawable/ic_menu_black_24dp"
             app:title="@string/app_name" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

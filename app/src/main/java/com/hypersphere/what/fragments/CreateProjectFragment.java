@@ -115,7 +115,6 @@ public class CreateProjectFragment extends Fragment {
 						latitude,
 						longitude,
 						null,
-						null,
 						CloudManager.getCurUser().id,
 						moneyWalletInput.getText().toString()
 				);

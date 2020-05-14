@@ -131,6 +131,14 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		return mView;
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		infoBehaviour.setHideable(true);
+		infoBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
+		infoCard.setVisibility(View.GONE);
+	}
+
 	private void setUpButtons(){
 		mView.findViewById(R.id.my_position_button).setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -220,6 +228,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		if (requestCode == LOCATION_REQUEST) {
 			if (!hasGPSPermission()) {
+				// TODO: 15.05.2020
 				Toast.makeText(getContext(), "All right, then. Keep your secrets.", Toast.LENGTH_LONG).show();
 				setUpMap();
 			} else {
@@ -303,6 +312,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		focusedOnMarker = !focusedOnMarker;
 
 		if(focusedOnMarker) {
+			infoCard.setVisibility(View.VISIBLE);
 			if(infoBehaviour.getState()==BottomSheetBehavior.STATE_HIDDEN)
 				infoBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
 			infoBehaviour.setHideable(false);
@@ -337,7 +347,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		googleMap.getUiSettings().setMapToolbarEnabled(false);
 
 		if (hasGPSPermission())
-			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMyPosition(), 16));
+			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getMyPosition(), 16));
 
 
 	}

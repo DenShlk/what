@@ -16,19 +16,24 @@
 
     <style name="Widget.What.MaterialAlertDialog" parent="Theme.MaterialComponents.Light.Dialog.Alert.Bridge">
         <item name="android:buttonBarPositiveButtonStyle">@style/Widget.What.PositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.What.Button.TextButton</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.What.PositiveButton</item>
     </style>
 
     <style name="Widget.What.PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
-    <style name="Widget.What.TextView" parent="Widget.MaterialComponents.TextView">
+    <style name="Widget.What.TextView.CustomFont" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/autowide</item>
     </style>
 
-    <style name="Widget.What.TextView.Logo">
+    <style name="Widget.What.TextView.CustomFont.Logo">
         <item name="android:textColor">@color/logoColor</item>
+    </style>
+
+    <style name="TextAppearance.What.Headline.CustomFont" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">@font/autowide</item>
     </style>
 
     <style name="Widget.What.TextInput.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">

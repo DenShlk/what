@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.model.UserEntry;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -33,11 +34,6 @@ public class SplashActivity extends AppCompatActivity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_splash);
 
-		if (CloudManager.isLoginNeed())
-			nextActivity = new Intent(SplashActivity.this, LoginActivity.class);
-		else
-			nextActivity = new Intent(SplashActivity.this, MainActivity.class);
-
 		//animations
 		topAnim = AnimationUtils.loadAnimation(this, R.anim.from_top_animation);
 		bottomAnim = AnimationUtils.loadAnimation(this, R.anim.from_bottom_animation);
@@ -47,25 +43,43 @@ public class SplashActivity extends AppCompatActivity {
 		//Hooks
 		topText = findViewById(R.id.slogan_text_1);
 		bottomText = findViewById(R.id.slogan_text_2);
+		View splashLayout = findViewById(R.id.splash_layout);
 
 		topText.setAnimation(topAnim);
 		bottomText.setAnimation(bottomAnim);
 
-		timer.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-				startActivity(intent);
-				finish();
-			}
-		}, SPLASH_DURATION);
-	}
 
-	public void onSplashClick(View view) {
-		view.setEnabled(false);
-		timer.removeCallbacksAndMessages(null);
+		if (CloudManager.isLoginNeed()) {
+			nextActivity = new Intent(SplashActivity.this, LoginActivity.class);
+			timer.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+				}
+			}, SPLASH_DURATION);
+			splashLayout.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					v.setEnabled(false);
+					timer.removeCallbacksAndMessages(null);
 
-		startActivity(nextActivity);
-		finish();
+					startActivity(nextActivity);
+					finish();
+				}
+			});
+		}
+		else {
+			nextActivity = new Intent(SplashActivity.this, MainActivity.class);
+			CloudManager.setUserDownloadListener(new CloudManager.OnDownloadListener<UserEntry>() {
+				@Override
+				public void onComplete(UserEntry data) {
+					startActivity(nextActivity);
+					finish();
+				}
+
+				@Override
+				public void onCancel() {}
+			});
+		}
+
 	}
 }
