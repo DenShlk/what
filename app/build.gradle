@@ -10,7 +10,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.navigation.runner.AndroidJUnitRunner"
     }
 
 
@@ -21,7 +21,7 @@ android {
         }
     }
 
-    //yandex money api doesn't work without that :(
+    //yandex money api doesn't work without that
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -44,10 +44,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.1.1'
     implementation 'com.google.firebase:firebase-auth:19.3.1'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test:runner:1.3.0-beta01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-beta01'
+    //errors in build after restart android studio 16.05.2020 ¯\_(0_0)_/¯
+    //testImplementation 'androidx.navigation:core:1.2.0'
+    //androidTestImplementation 'androidx.navigation.ext:junit:1.1.1'
+    //androidTestImplementation 'androidx.navigation:runner:1.3.0-beta01'
+    //androidTestImplementation 'androidx.navigation.espresso:espresso-core:3.3.0-beta01'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     //keyboard state detection library
@@ -59,11 +60,15 @@ dependencies {
     //bottom draggable and scrollable panel
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     //view for timeline
+    //was used in progress cards. now it useless :(
     implementation 'com.github.vipulasri:timelineview:1.1.4'
     //recycler view with overscroll
     implementation 'com.chauthai.overscroll:overscroll-bouncy:0.1.1'
     //yandex money api
     implementation 'com.yandex.money.api:yandex-money-sdk-android:4.1.4'
     //particle confetti effect for project done activity:D
+    //not using it now
     implementation 'com.github.jinatonic.confetti:confetti:1.1.2'
+    //it is the best dot-indicator in galaxy! you MUST use it.
+    implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
 }

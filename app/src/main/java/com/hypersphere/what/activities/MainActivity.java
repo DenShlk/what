@@ -32,20 +32,25 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 	Map<View, Fragment> menuMap = new HashMap<>();
 	Map<View, Integer> menuOrder = new HashMap<>();
 	List<Button> menuButtons;
-	MenuController menuController;
+	public MenuController menuController;
+	public Button menuMapButton;
+	public Button menuCreateButton;
+	public Button menuProfileButton;
+	public Button menuFeedButton;
+	public Toolbar toolbar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		Toolbar toolbar = findViewById(R.id.app_bar);
+		toolbar = findViewById(R.id.app_bar);
 		frameLayout = findViewById(R.id.main_fragment_container);
 
-		Button menuMapButton = findViewById(R.id.menu_map_button);
-		Button menuCreateButton = findViewById(R.id.menu_create_button);
-		Button menuProfileButton = findViewById(R.id.menu_profile_button);
-		Button menuFeedButton = findViewById(R.id.menu_feed_button);
+		menuMapButton = findViewById(R.id.menu_map_button);
+		menuCreateButton = findViewById(R.id.menu_create_button);
+		menuProfileButton = findViewById(R.id.menu_profile_button);
+		menuFeedButton = findViewById(R.id.menu_feed_button);
 		menuButtons = Arrays.asList(menuMapButton, menuFeedButton, menuCreateButton, menuProfileButton);
 
 		menuMap.put(menuMapButton, new GoogleMapFragment());

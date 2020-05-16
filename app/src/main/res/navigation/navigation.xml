@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_loginActivity_to_mainActivity"
             app:destination="@id/mainActivity" />
+        <action
+            android:id="@+id/action_loginActivity_to_tutorialActivity"
+            app:destination="@id/tutorialActivity" />
     </activity>
     <fragment
         android:id="@+id/profileFragment"
@@ -49,6 +52,12 @@
         <action
             android:id="@+id/action_mainActivity_to_googleMapsFragment"
             app:destination="@id/googleMapsFragment" />
+        <action
+            android:id="@+id/action_mainActivity_to_projectDoneActivity"
+            app:destination="@id/projectDoneActivity" />
+        <action
+            android:id="@+id/action_mainActivity_to_feedFragment"
+            app:destination="@id/feedFragment" />
     </activity>
     <activity
         android:id="@+id/locationSelectActivity"
@@ -64,4 +73,27 @@
             android:id="@+id/action_createProjectFragment_to_locationSelectActivity"
             app:destination="@id/locationSelectActivity" />
     </fragment>
+    <activity
+        android:id="@+id/projectDoneActivity"
+        android:name="com.hypersphere.what.activities.ProjectDoneActivity"
+        android:label="activity_project_done"
+        tools:layout="@layout/activity_project_done" >
+        <action
+            android:id="@+id/action_projectDoneActivity_to_mainActivity"
+            app:destination="@id/mainActivity" />
+    </activity>
+    <activity
+        android:id="@+id/tutorialActivity"
+        android:name="com.hypersphere.what.activities.TutorialActivity"
+        android:label="activity_tutorial"
+        tools:layout="@layout/activity_tutorial" >
+        <action
+            android:id="@+id/action_tutorialActivity_to_mainActivity"
+            app:destination="@id/mainActivity" />
+    </activity>
+    <fragment
+        android:id="@+id/feedFragment"
+        android:name="com.hypersphere.what.fragments.FeedFragment"
+        android:label="fragment_feed"
+        tools:layout="@layout/fragment_feed" />
 </navigation>

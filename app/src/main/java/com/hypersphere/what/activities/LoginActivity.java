@@ -28,7 +28,11 @@ public class LoginActivity extends AppCompatActivity {
 
 	Animation toLeft, toRight, fromLeft, fromRight;
 
-	TextInputLayout loginUserId, loginPassword, signUsername, signPassword, signEmail, signPhone;
+	TextInputLayout loginUserId;
+	TextInputLayout loginPassword;
+	TextInputLayout signUsername;
+	TextInputLayout signPassword;
+	TextInputLayout signEmail;
 	LinearLayout loginButtons, signButtons, mainLayout;
 
 	@Override
@@ -41,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
 		signUsername = findViewById(R.id.sign_username_layout);
 		signPassword = findViewById(R.id.sign_password_layout);
 		signEmail = findViewById(R.id.sign_email_layout);
-		signPhone = findViewById(R.id.sign_phone_layout);
 
 		loginButtons = findViewById(R.id.login_buttons_layout);
 		signButtons = findViewById(R.id.sign_buttons_layout);
@@ -96,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
 			CloudManager.login(email, password, new CloudManager.OnAuthListener() {
 				@Override
 				public void onSuccess() {
-					navigateToMain();
+					navigateToNext(false);
 				}
 
 				@Override
@@ -120,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
 			CloudManager.sign(username, email, password, new CloudManager.OnAuthListener() {
 				@Override
 				public void onSuccess() {
-					navigateToMain();
+					navigateToNext(true);
 				}
 
 				@Override
@@ -133,8 +136,12 @@ public class LoginActivity extends AppCompatActivity {
 			errorAnimate();
 	}
 
-	private void navigateToMain() {
-		Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+	private void navigateToNext(boolean isNewUser) {
+		Intent intent;
+		if(isNewUser)
+			intent = new Intent(LoginActivity.this, TutorialActivity.class);
+		else
+			intent = new Intent(LoginActivity.this, MainActivity.class);
 		startActivity(intent);
 		finish();
 	}
@@ -175,14 +182,12 @@ public class LoginActivity extends AppCompatActivity {
 
 				signUsername.setVisibility(View.VISIBLE);
 				signEmail.setVisibility(View.VISIBLE);
-				//signPhone.setVisibility(View.VISIBLE);
 				signPassword.setVisibility(View.VISIBLE);
 				signButtons.setVisibility(View.VISIBLE);
 				signUsername.startAnimation(fromRight);
 				signEmail.startAnimation(fromLeft);
-				signPhone.startAnimation(fromRight);
-				signPassword.startAnimation(fromLeft);
-				signButtons.startAnimation(fromRight);
+				signPassword.startAnimation(fromRight);
+				signButtons.startAnimation(fromLeft);
 
 			}
 		}, 250);
@@ -192,16 +197,14 @@ public class LoginActivity extends AppCompatActivity {
 		mode = LOGIN_MODE;
 		signUsername.startAnimation(toRight);
 		signEmail.startAnimation(toLeft);
-		signPhone.startAnimation(toRight);
-		signPassword.startAnimation(toLeft);
-		signButtons.startAnimation(toRight);
+		signPassword.startAnimation(toRight);
+		signButtons.startAnimation(toLeft);
 
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				signUsername.setVisibility(View.GONE);
 				signEmail.setVisibility(View.GONE);
-				signPhone.setVisibility(View.GONE);
 				signPassword.setVisibility(View.GONE);
 				signButtons.setVisibility(View.GONE);
 

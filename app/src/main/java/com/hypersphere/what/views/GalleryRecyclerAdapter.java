@@ -43,6 +43,11 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 		notifyItemRangeInserted(images.size() - 1, 1);
 	}
 
+	public void addImage(@NonNull Bitmap image, int index){
+		images.add(index, image);
+		notifyItemRangeInserted(index, 1);
+	}
+
 	public List<Bitmap> getImages(){
 		// TODO: 28.04.2020 copy
 		List<Bitmap> res = new ArrayList<>();

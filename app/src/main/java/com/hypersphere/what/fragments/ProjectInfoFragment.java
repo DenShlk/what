@@ -170,11 +170,13 @@ public class ProjectInfoFragment extends Fragment {
 		});
 
 		infoGalleryAdapter.clear();
-		for(String src : project.images){
-			CloudManager.loadImage(src, new CloudManager.OnDownloadListener<Bitmap>() {
+		for (int i = 0; i < project.images.size(); i++) {
+			int finalI = i;
+			CloudManager.loadImage(project.images.get(i), new CloudManager.OnDownloadListener<Bitmap>() {
+				int curI = finalI;
 				@Override
 				public void onComplete(Bitmap data) {
-					infoGalleryAdapter.addImage(data);
+					infoGalleryAdapter.addImage(data, curI);
 				}
 
 				@Override

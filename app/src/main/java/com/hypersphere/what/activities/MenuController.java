@@ -24,6 +24,8 @@ import com.hypersphere.what.R;
  */
 public class MenuController implements View.OnClickListener {
 
+    public static final int ANIMATION_DURATION = 500;
+
     private final AnimatorSet animatorSet = new AnimatorSet();
     private final AnimationSet animationSet = new AnimationSet(false);  //i like these 2 lines
     private Activity activity;
@@ -87,7 +89,7 @@ public class MenuController implements View.OnClickListener {
         if(menuShown){
             //hide keyboard
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(),
+            imm.hideSoftInputFromWindow(backgroundButton.getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
 
         }
@@ -106,10 +108,10 @@ public class MenuController implements View.OnClickListener {
         final int translateX = (int) (width * 0.70);
 
         ObjectAnimator translationAnimator = ObjectAnimator.ofFloat(sheet, "translationX", menuShown ? translateX : 0);
-        translationAnimator.setDuration(500);
+        translationAnimator.setDuration(ANIMATION_DURATION);
         Animation scaleAnimation = AnimationUtils.loadAnimation(activity, menuShown ? R.anim.scale_down_animation : R.anim.scale_up_animation);
         scaleAnimation.setFillAfter(true);
-        scaleAnimation.setDuration(500);
+        scaleAnimation.setDuration(ANIMATION_DURATION);
         if (interpolator != null) {
             translationAnimator.setInterpolator(interpolator);
             scaleAnimation.setInterpolator(interpolator);

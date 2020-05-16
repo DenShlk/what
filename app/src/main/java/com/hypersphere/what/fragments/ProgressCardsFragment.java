@@ -1,4 +1,4 @@
-package com.hypersphere.what;
+package com.hypersphere.what.fragments;
 
 
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hypersphere.what.R;
 import com.hypersphere.what.views.ProgressStepAdapter;
 import com.hypersphere.what.views.TimePointAdapter;
 

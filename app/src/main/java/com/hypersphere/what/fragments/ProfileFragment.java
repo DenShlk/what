@@ -52,16 +52,17 @@ public class ProfileFragment extends Fragment {
 		pagerSnap.attachToRecyclerView(activeRecycler);
 
 		final ProjectCardAdapter activeAdapter = new ProjectCardAdapter(getProjects(0), projectPreviewClickListener);
-		CloudManager.loadProjectsDone(new CloudManager.OnDownloadListener<List<ProjectEntry>>() {
-			@Override
-			public void onComplete(List<ProjectEntry> data) {
-				for(ProjectEntry project : data)
-					activeAdapter.addProject(project);
-			}
+		for(String projectId : CloudManager.getCurUser().myProjects){
+			CloudManager.loadProject(projectId, new CloudManager.OnDownloadListener<ProjectEntry>() {
+				@Override
+				public void onComplete(ProjectEntry data) {
+					activeAdapter.addProject(data);
+				}
 
-			@Override
-			public void onCancel() {}
-		});
+				@Override
+				public void onCancel() {}
+			});
+		}
 		activeRecycler.setAdapter(activeAdapter);
 
 		RecyclerView finishedRecycler = mView.findViewById(R.id.profile_finished_recycler);

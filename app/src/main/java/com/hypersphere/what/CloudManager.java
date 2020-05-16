@@ -356,6 +356,8 @@ public class CloudManager {
 						projectsDoneNotificationRef.child(data.id).push().setValue(project.id);
 					}
 				});
+				data.myProjects.remove(project);
+				usersRef.child(project.creatorId).setValue(data);
 			}
 
 			@Override

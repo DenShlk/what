@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:hint="password"
                 android:inputType="textPassword"
-                />
+                android:nextFocusDown="@id/login_login_button"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -96,23 +96,6 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/sign_phone_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.What.TextInput.OutlinedBox"
-            android:visibility="gone">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/sign_phone_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="phone"
-                android:inputType="phone"
-                />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/sign_password_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,6 +109,7 @@
                 android:layout_height="wrap_content"
                 android:hint="password"
                 android:inputType="textPassword"
+                android:nextFocusDown="@+id/login_sign_button"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>

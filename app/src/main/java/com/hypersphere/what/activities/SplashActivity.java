@@ -54,6 +54,8 @@ public class SplashActivity extends AppCompatActivity {
 			timer.postDelayed(new Runnable() {
 				@Override
 				public void run() {
+					startActivity(nextActivity);
+					finish();
 				}
 			}, SPLASH_DURATION);
 			splashLayout.setOnClickListener(new View.OnClickListener() {

@@ -162,7 +162,6 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 					mBottomSheetDialog.setContentView(sheetView);
 					mBottomSheetDialog.show();
 
-					// TODO: 27.04.2020 image viewer ... may be with scrolling?
 					View viewButton = sheetView.findViewById(R.id.dialog_view_image);
 					viewButton.setOnClickListener(new View.OnClickListener() {
 						@Override
