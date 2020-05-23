@@ -72,7 +72,7 @@
                     android:background="@drawable/top_circle_corner_shape"
                     android:elevation="0dp"
                     android:src="@drawable/ic_add_black_24dp"
-                    app:iconGravity="textStart" />
+                    app:iconGravity="textStart"/>
 
                 <ImageButton
                     android:id="@+id/zoom_out_button"
@@ -153,7 +153,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

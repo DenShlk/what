@@ -18,10 +18,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
-        android:hint="Amount"
+        android:hint="@string/payment_dialog_amount"
         android:inputType="numberDecimal"
         android:maxLines="1"
-        android:paddingEnd="5dp"/>
+        android:paddingHorizontal="5dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

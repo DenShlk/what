@@ -20,13 +20,9 @@ public class SplashActivity extends AppCompatActivity {
 
 	private static final int SPLASH_DURATION = 3000;
 
-	Animation topAnim, bottomAnim;
+	private final Handler timer = new Handler();
 
-	TextView topText, bottomText;
-
-	Handler timer = new Handler();
-
-	Intent nextActivity;
+	private Intent nextActivity;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +31,14 @@ public class SplashActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_splash);
 
 		//animations
-		topAnim = AnimationUtils.loadAnimation(this, R.anim.from_top_animation);
-		bottomAnim = AnimationUtils.loadAnimation(this, R.anim.from_bottom_animation);
+		Animation topAnim = AnimationUtils.loadAnimation(this, R.anim.from_top_animation);
+		Animation bottomAnim = AnimationUtils.loadAnimation(this, R.anim.from_bottom_animation);
 		topAnim.setInterpolator(new DecelerateInterpolator());
 		bottomAnim.setInterpolator(new DecelerateInterpolator());
 
 		//Hooks
-		topText = findViewById(R.id.slogan_text_1);
-		bottomText = findViewById(R.id.slogan_text_2);
+		TextView topText = findViewById(R.id.slogan_text_1);
+		TextView bottomText = findViewById(R.id.slogan_text_2);
 		View splashLayout = findViewById(R.id.splash_layout);
 
 		topText.setAnimation(topAnim);
@@ -51,22 +47,16 @@ public class SplashActivity extends AppCompatActivity {
 
 		if (CloudManager.isLoginNeed()) {
 			nextActivity = new Intent(SplashActivity.this, LoginActivity.class);
-			timer.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					startActivity(nextActivity);
-					finish();
-				}
+			timer.postDelayed(() -> {
+				startActivity(nextActivity);
+				finish();
 			}, SPLASH_DURATION);
-			splashLayout.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					v.setEnabled(false);
-					timer.removeCallbacksAndMessages(null);
+			splashLayout.setOnClickListener(v -> {
+				v.setEnabled(false);
+				timer.removeCallbacksAndMessages(null);
 
-					startActivity(nextActivity);
-					finish();
-				}
+				startActivity(nextActivity);
+				finish();
 			});
 		}
 		else {

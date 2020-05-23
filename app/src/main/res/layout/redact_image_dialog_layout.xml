@@ -15,7 +15,7 @@
         style="@style/TextAppearance.MaterialComponents.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="What do you want?"/>
+        android:text="@string/redact_image_what"/>
 
     <LinearLayout
         android:id="@+id/dialog_view_image"
@@ -37,8 +37,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="View image" />
+            android:layout_marginStart="16dp"
+            android:text="@string/redact_image_view_image" />
     </LinearLayout>
 
     <LinearLayout
@@ -61,8 +61,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="Retake a photo" />
+            android:layout_marginStart="16dp"
+            android:text="@string/redact_image_retake_a_photo" />
     </LinearLayout>
 
     <LinearLayout
@@ -85,8 +85,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="Open other" />
+            android:layout_marginStart="16dp"
+            android:text="@string/redact_image_open_other" />
     </LinearLayout>
 
     <LinearLayout
@@ -109,7 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="Delete image" />
+            android:layout_marginStart="16dp"
+            android:text="@string/redact_image_delete_image" />
     </LinearLayout>
 </LinearLayout>

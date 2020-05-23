@@ -52,18 +52,6 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="Widget.What.NavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
-        <item name="android:background">@color/backgroundColor</item>
-        <item name="itemTextColor">@drawable/navigation_bar_selector</item>
-        <item name="itemIconTint">@drawable/navigation_bar_selector</item>
-    </style>
-
-    <style name="Widget.What.TextInputLayout.Profile" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="hintTextColor">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorAccent</item>
-        <item name="boxStrokeColor">@color/colorAccent</item>
-    </style>
-
     <style name="Widget.What.TextInput.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="hintTextColor">@color/textColor</item>
     </style>

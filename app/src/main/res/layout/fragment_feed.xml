@@ -26,7 +26,7 @@
             app:layout_constraintWidth_percent="0.8"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+            app:layout_constraintTop_toTopOf="@+id/guideline2"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
@@ -41,7 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:autoSizeTextType="uniform"
-            android:text="No active projects"
+            android:text="@string/feed_no_active_projects"
             android:textSize="30sp"
             android:textAlignment="center"
             android:textColor="@color/colorPrimaryDark"
@@ -58,7 +58,7 @@
             app:layout_constraintWidth_percent="0.5"
             app:cornerRadius="22.5dp"
             android:layout_marginTop="15dp"
-            android:text="Create new"
+            android:text="@string/feed_create_new"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView4" />

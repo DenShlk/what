@@ -38,10 +38,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Write title"
+                        android:hint="@string/create_write_title"
                         android:inputType="textCapSentences"
                         android:maxLines="1"
-                        android:paddingEnd="5dp"/>
+                        android:paddingHorizontal="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -57,9 +57,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Add description"
+                        android:hint="@string/create_add_description"
                         android:inputType="textMultiLine"
-                        android:paddingEnd="5dp"/>
+                        android:paddingHorizontal="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -75,10 +75,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Enter full price of project"
+                        android:hint="@string/create_enter_full_price_of_project"
                         android:inputType="numberDecimal"
                         android:maxLines="1"
-                        android:paddingEnd="5dp"/>
+                        android:paddingHorizontal="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -94,10 +94,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Enter your investment"
+                        android:hint="@string/create_enter_your_investment"
                         android:inputType="numberDecimal"
                         android:maxLines="1"
-                        android:paddingEnd="5dp"/>
+                        android:paddingHorizontal="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -115,10 +115,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/backgroundColor"
-                        android:hint="Project Yandex wallet number"
+                        android:hint="@string/create_project_yandex_wallet_number"
                         android:inputType="number"
                         android:maxLines="1"
-                        android:paddingEnd="5dp"/>
+                        android:paddingHorizontal="5dp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -138,9 +138,9 @@
                         android:focusable="false"
                         android:longClickable="false"
                         android:background="@color/backgroundColor"
-                        android:hint="Project will be situated..."
+                        android:hint="@string/create_project_will_be_situated"
                         android:inputType="none"
-                        android:paddingEnd="5dp"
+                        android:paddingHorizontal="5dp"
                         android:cursorVisible="false"/>
 
                 </com.google.android.material.textfield.TextInputLayout>

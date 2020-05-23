@@ -29,10 +29,10 @@ import java.util.List;
 
 public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<EditableGalleryRecyclerAdapter.ImageViewHolder> {
 
-	private List<Bitmap> images;
-	private OnResultCallbackActivity activity;
+	private final List<Bitmap> images;
+	private final OnResultCallbackActivity activity;
 
-	private int minImagesCount = 10;
+	private final int minImagesCount = 10;
 
 	public EditableGalleryRecyclerAdapter(OnResultCallbackActivity activity) {
 		this.activity = activity;
@@ -68,7 +68,6 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 	}
 
 	public List<Bitmap> getImages(){
-		// TODO: 28.04.2020 copy
 		List<Bitmap> res = new ArrayList<>();
 		for(Bitmap bmp : images)
 			if(bmp!=null)
@@ -107,9 +106,10 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 
 		private Bitmap image;
-		private ImageView imageView, addButton;
+		private final ImageView imageView;
+		private final ImageView addButton;
 
-		public ImageViewHolder(@NonNull View itemView) {
+		ImageViewHolder(@NonNull View itemView) {
 			super(itemView);
 
 			imageView = itemView.findViewById(R.id.image_view);
@@ -117,113 +117,84 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 			imageView.setImageBitmap(null);
 
-			addButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
-					View sheetView = activity.getLayoutInflater().inflate(R.layout.add_image_dialog_layout, null);
-					mBottomSheetDialog.setContentView(sheetView);
-					mBottomSheetDialog.show();
+			addButton.setOnClickListener(v -> {
+				final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
+				View sheetView = activity.getLayoutInflater().inflate(R.layout.add_image_dialog_layout, null);
+				mBottomSheetDialog.setContentView(sheetView);
+				mBottomSheetDialog.show();
 
-					View takeButton = sheetView.findViewById(R.id.dialog_take_photo);
-					takeButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							activity.startActivityForResult(cameraIntent, REQUEST_NEW_IMAGE_CAPTURE);
-							activity.setWaitForCallback(ImageViewHolder.this);
+				View takeButton = sheetView.findViewById(R.id.dialog_take_photo);
+				takeButton.setOnClickListener(v17 -> {
+					Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					activity.startActivityForResult(cameraIntent, REQUEST_NEW_IMAGE_CAPTURE);
+					activity.setWaitForCallback(ImageViewHolder.this);
 
-							mBottomSheetDialog.cancel();
-						}
-					});
+					mBottomSheetDialog.cancel();
+				});
 
-					View galleryButton = sheetView.findViewById(R.id.dialog_open_gallery);
-					galleryButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							Intent galleryIntent = new Intent(Intent.ACTION_PICK);
-							galleryIntent.setType("image/*");
-							galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-							activity.startActivityForResult(galleryIntent, REQUEST_NEW_IMAGE_FROM_GALLERY);
-							activity.setWaitForCallback(ImageViewHolder.this);
+				View galleryButton = sheetView.findViewById(R.id.dialog_open_gallery);
+				galleryButton.setOnClickListener(v16 -> {
+					Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+					galleryIntent.setType("image/*");
+					galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+					activity.startActivityForResult(galleryIntent, REQUEST_NEW_IMAGE_FROM_GALLERY);
+					activity.setWaitForCallback(ImageViewHolder.this);
 
-							mBottomSheetDialog.cancel();
-						}
-					});
+					mBottomSheetDialog.cancel();
+				});
 
-				}
 			});
 
-			imageView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
-					View sheetView = activity.getLayoutInflater().inflate(R.layout.redact_image_dialog_layout, null);
-					mBottomSheetDialog.setContentView(sheetView);
-					mBottomSheetDialog.show();
+			imageView.setOnClickListener(v -> {
+				final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
+				View sheetView = activity.getLayoutInflater().inflate(R.layout.redact_image_dialog_layout, null);
+				mBottomSheetDialog.setContentView(sheetView);
+				mBottomSheetDialog.show();
 
-					View viewButton = sheetView.findViewById(R.id.dialog_view_image);
-					viewButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent);
-							showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-							showDialog.setCancelable(true);
-							showDialog.setContentView(R.layout.image_viewer_layout);
-							ImageView imageView = showDialog.findViewById(R.id.image_view);
-							imageView.setImageBitmap(image);
-							View backButton = showDialog.findViewById(R.id.back_button);
-							backButton.setOnClickListener(new View.OnClickListener() {
-								@Override
-								public void onClick(View v) {
-									showDialog.dismiss();
-								}
-							});
-							showDialog.show();
+				View viewButton = sheetView.findViewById(R.id.dialog_view_image);
+				viewButton.setOnClickListener(v15 -> {
+					final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent);
+					showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+					showDialog.setCancelable(true);
+					showDialog.setContentView(R.layout.image_viewer_layout);
+					ImageView imageView = showDialog.findViewById(R.id.image_view);
+					imageView.setImageBitmap(image);
+					View backButton = showDialog.findViewById(R.id.back_button);
+					backButton.setOnClickListener(v14 -> showDialog.dismiss());
+					showDialog.show();
 
 
-							mBottomSheetDialog.cancel();
-						}
-					});
+					mBottomSheetDialog.cancel();
+				});
 
-					View retakeButton = sheetView.findViewById(R.id.dialog_retake_photo);
-					retakeButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
+				View retakeButton = sheetView.findViewById(R.id.dialog_retake_photo);
+				retakeButton.setOnClickListener(v13 -> {
 
-							Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-							activity.startActivityForResult(cameraIntent, REQUEST_IMAGE_RECAPTURE);
-							activity.setWaitForCallback(ImageViewHolder.this);
+					Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					activity.startActivityForResult(cameraIntent, REQUEST_IMAGE_RECAPTURE);
+					activity.setWaitForCallback(ImageViewHolder.this);
 
-							mBottomSheetDialog.cancel();
-						}
-					});
+					mBottomSheetDialog.cancel();
+				});
 
-					View reopenButton = sheetView.findViewById(R.id.dialog_reopen_gallery);
-					reopenButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
+				View reopenButton = sheetView.findViewById(R.id.dialog_reopen_gallery);
+				reopenButton.setOnClickListener(v12 -> {
 
-							Intent galleryIntent = new Intent(Intent.ACTION_PICK);
-							galleryIntent.setType("image/*");
-							galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-							activity.startActivityForResult(galleryIntent, REQUEST_REOPEN_IMAGE_FROM_GALLERY);
-							activity.setWaitForCallback(ImageViewHolder.this);
+					Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+					galleryIntent.setType("image/*");
+					galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+					activity.startActivityForResult(galleryIntent, REQUEST_REOPEN_IMAGE_FROM_GALLERY);
+					activity.setWaitForCallback(ImageViewHolder.this);
 
-							mBottomSheetDialog.cancel();
-						}
-					});
+					mBottomSheetDialog.cancel();
+				});
 
-					View deleteButton = sheetView.findViewById(R.id.dialog_delete_photo);
-					deleteButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							deleteImage(getAdapterPosition());
+				View deleteButton = sheetView.findViewById(R.id.dialog_delete_photo);
+				deleteButton.setOnClickListener(v1 -> {
+					deleteImage(getAdapterPosition());
 
-							mBottomSheetDialog.cancel();
-						}
-					});
-				}
+					mBottomSheetDialog.cancel();
+				});
 			});
 
 		}

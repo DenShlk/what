@@ -1,7 +1,6 @@
 package com.hypersphere.what.views;
 
 import android.graphics.Bitmap;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hypersphere.what.CloudManager;
-import com.hypersphere.what.ImageRequester;
 import com.hypersphere.what.R;
-import com.hypersphere.what.Utils;
 import com.hypersphere.what.model.ProjectEntry;
 
 import java.util.ArrayList;
@@ -23,13 +20,8 @@ import java.util.List;
 
 public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.ProjectCardHolder> {
 
-	private List<ProjectEntry> projectList;
-	private ProjectPreviewClickListener itemClickListener;
-
-	public ProjectCardAdapter(List<ProjectEntry> projectList, ProjectPreviewClickListener itemClickListener) {
-		this.projectList = projectList;
-		this.itemClickListener = itemClickListener;
-	}
+	private final List<ProjectEntry> projectList;
+	private final ProjectPreviewClickListener itemClickListener;
 
 	public ProjectCardAdapter(ProjectPreviewClickListener itemClickListener) {
 		projectList = new ArrayList<>();
@@ -39,7 +31,7 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 	@NonNull
 	@Override
 	public ProjectCardHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-		View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.project_card_new, parent, false);
+		View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.project_card, parent, false);
 		return new ProjectCardHolder(layoutView);
 	}
 
@@ -69,19 +61,17 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 
 		ProjectEntry project;
 
-		private ImageRequester imageRequester;
-
-		private CardView projectCard;
-		private ImageView previewImage;
-		private TextView title, description, progressText;
-		private AnimatedProgressBar progressBar;
+		private final CardView projectCard;
+		private final ImageView previewImage;
+		private final TextView title;
+		private final TextView description;
+		private final TextView progressText;
+		private final AnimatedProgressBar progressBar;
 
 		private ProjectPreviewClickListener listener;
 
 		public ProjectCardHolder(@NonNull View itemView) {
 			super(itemView);
-
-			imageRequester = ImageRequester.getInstance();
 
 			projectCard = itemView.findViewById(R.id.project_card);
 			previewImage = itemView.findViewById(R.id.card_preview_image);
@@ -90,19 +80,7 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 			progressBar = itemView.findViewById(R.id.card_progress_bar);
 			progressText = itemView.findViewById(R.id.card_progress_text);
 
-			final Pair[] pairs = new Pair[2];
-			pairs[0] = new Pair<View, String>(previewImage, "project_preview_image");
-			pairs[1] = new Pair<View, String>(progressBar, "project_progress_bar");
-			//pairs[2] = new Pair<View, String>(title, "project_title_text");
-			//pairs[3] = new Pair<View, String>(progressText, "card_progress_text");
-			//pairs[4] = new Pair<View, String>(description, "project_description_text");
-
-			projectCard.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					listener.projectPreviewClick(project, pairs);
-				}
-			});
+			projectCard.setOnClickListener(v -> listener.projectPreviewClick(project));
 		}
 
 		public void reloadProject(){
@@ -120,15 +98,11 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 			title.setText(project.title);
 			description.setText(project.description);
 
-			// so if you have more values in progress bar it allow you to display cool animation
 			progressBar.setMax(project.donationsGoal);
-			progressBar.setProgress(0, false);
 			progressBar.setProgress(project.donationsCollected, true);
 
-			//holder.progressBar.setProgress((int) project.donationsCollected, true);
-			progressText.setText(Utils.getProgressString(project.donationsCollected, project.donationsGoal));
-			// TODO: 28.04.2020
-			//imageRequester.setImageFromUrl(previewImage, project.previewImageUrl);
+			progressText.setText(ProjectEntry.getProgressString(project.donationsCollected, project.donationsGoal));
+
 			CloudManager.loadImage(project.images.get(0), new CloudManager.OnDownloadListener<Bitmap>() {
 				@Override
 				public void onComplete(Bitmap data) {
@@ -144,6 +118,6 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 	}
 
 	public interface ProjectPreviewClickListener{
-		void projectPreviewClick(ProjectEntry project, Pair[] transitionViews);
+		void projectPreviewClick(ProjectEntry project);
 	}
 }

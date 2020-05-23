@@ -4,14 +4,12 @@ import android.animation.TimeInterpolator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,16 +22,19 @@ public class LoginActivity extends AppCompatActivity {
 	private static final int LOGIN_MODE = 1;
 	private static final int SIGN_MODE = 2;
 
-	int mode = SIGN_MODE;
+	private int mode = SIGN_MODE;
 
-	Animation toLeft, toRight, fromLeft, fromRight;
+	private Animation toLeft;
+	private Animation toRight;
+	private Animation fromLeft;
+	private Animation fromRight;
 
-	TextInputLayout loginUserId;
-	TextInputLayout loginPassword;
-	TextInputLayout signUsername;
-	TextInputLayout signPassword;
-	TextInputLayout signEmail;
-	LinearLayout loginButtons, signButtons, mainLayout;
+	private TextInputLayout loginUserId;
+	private TextInputLayout loginPassword;
+	private TextInputLayout signUsername;
+	private TextInputLayout signPassword;
+	private TextInputLayout signEmail;
+	private LinearLayout loginButtons, signButtons, mainLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,35 +60,29 @@ public class LoginActivity extends AppCompatActivity {
 		fromLeft.setInterpolator(new DecelerateInterpolator());
 		fromRight.setInterpolator(new DecelerateInterpolator());
 
-		loginUserId.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				String email = v.getText().toString();
-				if (!checkEmail(email))
-					loginUserId.setError("Email invalid");
-				else
-					loginUserId.setError("");
-				return false;
-			}
+		loginUserId.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			String email = v.getText().toString();
+			if (!checkEmail(email))
+				loginUserId.setError("Email invalid");
+			else
+				loginUserId.setError("");
+			return false;
 		});
-		loginPassword.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				String password = v.getText().toString();
-				if (checkPassword(password))
-					loginUserId.setError("At least 6 characters");
-				else
-					loginUserId.setError("");
-				return false;
-			}
+		loginPassword.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			String password = v.getText().toString();
+			if (checkPassword(password))
+				loginUserId.setError("At least 6 characters");
+			else
+				loginUserId.setError("");
+			return false;
 		});
 	}
 
-	boolean checkEmail(String email) {
+	private boolean checkEmail(String email) {
 		return email.matches(".+@.+\\..+");
 	}
 
-	boolean checkPassword(String password) {
+	private boolean checkPassword(String password) {
 		return password.length() >= 6;
 	}
 
@@ -113,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
 		}
 	}
 
-	public void signupClick(View v) {
+	public void signClick(View v) {
 		String username = signUsername.getEditText().getText().toString();
 		String email = signEmail.getEditText().getText().toString();
 		String password = signPassword.getEditText().getText().toString();
@@ -150,12 +145,9 @@ public class LoginActivity extends AppCompatActivity {
 		final float FREQ = 1.6f;
 		final float DECAY = 1.1f;
 		// interpolator that goes 1 -> -1 -> 1 -> -1 in a sine wave pattern.
-		TimeInterpolator decayingSineWave = new TimeInterpolator() {
-			@Override
-			public float getInterpolation(float input) {
-				double raw = Math.sin(FREQ * input * 2 * Math.PI);
-				return (float) (raw * Math.exp(-input * DECAY));
-			}
+		TimeInterpolator decayingSineWave = input -> {
+			double raw = Math.sin(FREQ * input * 2 * Math.PI);
+			return (float) (raw * Math.exp(-input * DECAY));
 		};
 
 		mainLayout.clearAnimation();
@@ -173,23 +165,20 @@ public class LoginActivity extends AppCompatActivity {
 		loginPassword.startAnimation(toRight);
 		loginButtons.startAnimation(toLeft);
 
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				loginUserId.setVisibility(View.GONE);
-				loginPassword.setVisibility(View.GONE);
-				loginButtons.setVisibility(View.GONE);
+		new Handler().postDelayed(() -> {
+			loginUserId.setVisibility(View.GONE);
+			loginPassword.setVisibility(View.GONE);
+			loginButtons.setVisibility(View.GONE);
 
-				signUsername.setVisibility(View.VISIBLE);
-				signEmail.setVisibility(View.VISIBLE);
-				signPassword.setVisibility(View.VISIBLE);
-				signButtons.setVisibility(View.VISIBLE);
-				signUsername.startAnimation(fromRight);
-				signEmail.startAnimation(fromLeft);
-				signPassword.startAnimation(fromRight);
-				signButtons.startAnimation(fromLeft);
+			signUsername.setVisibility(View.VISIBLE);
+			signEmail.setVisibility(View.VISIBLE);
+			signPassword.setVisibility(View.VISIBLE);
+			signButtons.setVisibility(View.VISIBLE);
+			signUsername.startAnimation(fromRight);
+			signEmail.startAnimation(fromLeft);
+			signPassword.startAnimation(fromRight);
+			signButtons.startAnimation(fromLeft);
 
-			}
 		}, 250);
 	}
 
@@ -200,22 +189,19 @@ public class LoginActivity extends AppCompatActivity {
 		signPassword.startAnimation(toRight);
 		signButtons.startAnimation(toLeft);
 
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				signUsername.setVisibility(View.GONE);
-				signEmail.setVisibility(View.GONE);
-				signPassword.setVisibility(View.GONE);
-				signButtons.setVisibility(View.GONE);
+		new Handler().postDelayed(() -> {
+			signUsername.setVisibility(View.GONE);
+			signEmail.setVisibility(View.GONE);
+			signPassword.setVisibility(View.GONE);
+			signButtons.setVisibility(View.GONE);
 
-				loginUserId.setVisibility(View.VISIBLE);
-				loginPassword.setVisibility(View.VISIBLE);
-				loginButtons.setVisibility(View.VISIBLE);
-				loginUserId.startAnimation(fromLeft);
-				loginPassword.startAnimation(fromRight);
-				loginButtons.startAnimation(fromLeft);
+			loginUserId.setVisibility(View.VISIBLE);
+			loginPassword.setVisibility(View.VISIBLE);
+			loginButtons.setVisibility(View.VISIBLE);
+			loginUserId.startAnimation(fromLeft);
+			loginPassword.startAnimation(fromRight);
+			loginButtons.startAnimation(fromLeft);
 
-			}
 		}, 250);
 	}
 }

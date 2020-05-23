@@ -2,7 +2,6 @@ package com.hypersphere.what.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +15,7 @@ import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
 public class TutorialActivity extends AppCompatActivity {
 
 	private ViewPager2 viewPager;
-	private WormDotsIndicator dotsIndicator;
+	private TutorialPageAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,36 +23,33 @@ public class TutorialActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_tutorial);
 
 		viewPager = findViewById(R.id.tutor_view_pager);
-		dotsIndicator = findViewById(R.id.tutor_dots_indicator);
+		viewPager.setOffscreenPageLimit(3);
+		WormDotsIndicator dotsIndicator = findViewById(R.id.tutor_dots_indicator);
 
-		TutorialPageAdapter adapter = new TutorialPageAdapter();
+		adapter = new TutorialPageAdapter();
 		viewPager.setAdapter(adapter);
 		dotsIndicator.setViewPager2(viewPager);
 
 		MaterialButton nextButton = findViewById(R.id.tutor_next_button);
-		nextButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(viewPager.getCurrentItem() == adapter.getItemCount() - 1) {
-					navigateToNext();
-				}
-				viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
-				if(viewPager.getCurrentItem() == adapter.getItemCount() - 1){
-					// TODO: 15.05.2020 to res
-					nextButton.setText("Done");
-				}
-			}
-		});
-		MaterialButton skipButton = findViewById(R.id.tutor_skip_button);
-		skipButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+		nextButton.setOnClickListener(v -> {
+			if(viewPager.getCurrentItem() == adapter.getItemCount() - 1) {
 				navigateToNext();
 			}
+			viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+		});
+		MaterialButton skipButton = findViewById(R.id.tutor_skip_button);
+		skipButton.setOnClickListener(v -> navigateToNext());
+
+		viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+			@Override
+			public void onPageSelected(int position) {
+				super.onPageSelected(position);
+				if(position == adapter.getItemCount() - 1)
+					nextButton.setText(getResources().getText(R.string.tutorial_done));
+			}
 		});
 
-
-		//different pages has different colors. So, we don't won't to change status bar color, we just hide it.
+		//different tutorial pages has different colors. So, we don't won't to change status bar color, we just hide it.
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 	}
 

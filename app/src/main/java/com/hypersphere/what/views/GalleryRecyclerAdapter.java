@@ -19,8 +19,8 @@ import java.util.List;
 
 public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecyclerAdapter.ImageViewHolder> {
 
-	private List<Bitmap> images = new ArrayList<>(0);
-	private Activity activity;
+	private final List<Bitmap> images = new ArrayList<>(0);
+	private final Activity activity;
 
 	public GalleryRecyclerAdapter(Activity activity) {
 		this.activity = activity;
@@ -46,15 +46,6 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 	public void addImage(@NonNull Bitmap image, int index){
 		images.add(index, image);
 		notifyItemRangeInserted(index, 1);
-	}
-
-	public List<Bitmap> getImages(){
-		// TODO: 28.04.2020 copy
-		List<Bitmap> res = new ArrayList<>();
-		for(Bitmap bmp : images)
-			if(bmp!=null)
-				res.add(bmp);
-		return res;
 	}
 
 	public void clear(){
@@ -86,9 +77,9 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 	public class ImageViewHolder extends RecyclerView.ViewHolder{
 
 		private Bitmap image;
-		private ImageView imageView;
+		private final ImageView imageView;
 
-		public ImageViewHolder(@NonNull View itemView) {
+		ImageViewHolder(@NonNull View itemView) {
 			super(itemView);
 
 			imageView = itemView.findViewById(R.id.image_view);
@@ -96,24 +87,16 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 			imageView.setImageBitmap(null);
 
 
-			imageView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent);
-					showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-					showDialog.setCancelable(true);
-					showDialog.setContentView(R.layout.image_viewer_layout);
-					ImageView imageView = showDialog.findViewById(R.id.image_view);
-					imageView.setImageBitmap(image);
-					View backButton = showDialog.findViewById(R.id.back_button);
-					backButton.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							showDialog.dismiss();
-						}
-					});
-					showDialog.show();
-				}
+			imageView.setOnClickListener(v -> {
+				final Dialog showDialog = new Dialog(activity, android.R.style.Theme_Translucent);
+				showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+				showDialog.setCancelable(true);
+				showDialog.setContentView(R.layout.image_viewer_layout);
+				ImageView imageView = showDialog.findViewById(R.id.image_view);
+				imageView.setImageBitmap(image);
+				View backButton = showDialog.findViewById(R.id.back_button);
+				backButton.setOnClickListener(v1 -> showDialog.dismiss());
+				showDialog.show();
 			});
 
 		}

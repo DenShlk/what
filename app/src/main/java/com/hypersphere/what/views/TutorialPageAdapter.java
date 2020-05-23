@@ -11,7 +11,7 @@ import com.hypersphere.what.R;
 
 public class TutorialPageAdapter extends RecyclerView.Adapter<TutorialPageAdapter.TutorialItemHolder> {
 
-	int[] items = {R.layout.tutorial_item_1_layout, R.layout.tutorial_item_2_layout, R.layout.tutorial_item_3_layout };
+	private final int[] items = {R.layout.tutorial_item_1_layout, R.layout.tutorial_item_2_layout, R.layout.tutorial_item_3_layout };
 
 	@NonNull
 	@Override
@@ -40,7 +40,7 @@ public class TutorialPageAdapter extends RecyclerView.Adapter<TutorialPageAdapte
 
 	class TutorialItemHolder extends RecyclerView.ViewHolder {
 
-		public TutorialItemHolder(@NonNull View itemView) {
+		TutorialItemHolder(@NonNull View itemView) {
 			super(itemView);
 		}
 	}

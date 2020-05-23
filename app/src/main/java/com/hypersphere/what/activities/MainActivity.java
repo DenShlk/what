@@ -25,26 +25,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends OnResultCallbackActivity implements NavigationHost {
+public class MainActivity extends OnResultCallbackActivity {
 
-	FrameLayout frameLayout;
+	private FrameLayout frameLayout;
 
-	Map<View, Fragment> menuMap = new HashMap<>();
-	Map<View, Integer> menuOrder = new HashMap<>();
-	List<Button> menuButtons;
+	private final Map<View, Fragment> menuMap = new HashMap<>();
+	private List<Button> menuButtons;
 	public MenuController menuController;
 	public Button menuMapButton;
 	public Button menuCreateButton;
 	public Button menuProfileButton;
 	public Button menuFeedButton;
-	public Toolbar toolbar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		toolbar = findViewById(R.id.app_bar);
+		Toolbar toolbar = findViewById(R.id.app_bar);
 		frameLayout = findViewById(R.id.main_fragment_container);
 
 		menuMapButton = findViewById(R.id.menu_map_button);
@@ -54,28 +52,21 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		menuButtons = Arrays.asList(menuMapButton, menuFeedButton, menuCreateButton, menuProfileButton);
 
 		menuMap.put(menuMapButton, new GoogleMapFragment());
-		menuOrder.put(menuMapButton, 1);
 		menuMap.put(menuFeedButton, new FeedFragment());
-		menuOrder.put(menuFeedButton, 2);
 		menuMap.put(menuCreateButton, new CreateProjectFragment());
-		menuOrder.put(menuCreateButton, 3);
 		menuMap.put(menuProfileButton, new ProfileFragment());
-		menuOrder.put(menuProfileButton, 4);
 
-		View.OnClickListener menuOnClick = new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				navigateTo(menuMap.get(view), false);
-				if(menuController.menuShown) {
-					menuController.onClick();
-				}
-
-				for(Button b : menuButtons)
-					b.setTextSize(15);
-
-				Button button = (Button) view;
-				button.setTextSize(18);
+		View.OnClickListener menuOnClick = view -> {
+			navigateTo(menuMap.get(view), false);
+			if(menuController.menuShown) {
+				menuController.onClick();
 			}
+
+			for(Button b : menuButtons)
+				b.setTextSize(15);
+
+			Button button = (Button) view;
+			button.setTextSize(18);
 		};
 
 		menuMapButton.setOnClickListener(menuOnClick);
@@ -99,26 +90,19 @@ public class MainActivity extends OnResultCallbackActivity implements Navigation
 		//menuCreateButton.callOnClick();
 		//menuProfileButton.callOnClick();
 
-		CloudManager.listenProjectDone(new CloudManager.OnProjectDoneListener() {
+		CloudManager.listenProjectDone(projectId -> CloudManager.loadProjectDone(projectId, new CloudManager.OnDownloadListener<ProjectEntry>() {
 			@Override
-			public void onProjectDone(String projectId) {
-				CloudManager.loadProjectDone(projectId, new CloudManager.OnDownloadListener<ProjectEntry>() {
-					@Override
-					public void onComplete(ProjectEntry data) {
-						// TODO: 14.05.2020 move to finished 
-						Intent intent = new Intent(MainActivity.this, ProjectDoneActivity.class);
-						intent.putExtra("projectName", data.title);
-						startActivity(intent);
-					}
-
-					@Override
-					public void onCancel() {}
-				});
+			public void onComplete(ProjectEntry data) {
+				Intent intent = new Intent(MainActivity.this, ProjectDoneActivity.class);
+				intent.putExtra("projectName", data.title);
+				startActivity(intent);
 			}
-		});
+
+			@Override
+			public void onCancel() {}
+		}));
 	}
 
-	@Override
 	public void navigateTo(Fragment fragment, boolean addToBackstack) {
 		FragmentTransaction transaction =
 				getSupportFragmentManager()

@@ -1,9 +1,9 @@
 package com.hypersphere.what.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +17,7 @@ import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
 import com.hypersphere.what.activities.MainActivity;
 import com.hypersphere.what.activities.MenuController;
+import com.hypersphere.what.activities.ProjectViewActivity;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.views.ProjectCardAdapter;
 
@@ -28,7 +29,7 @@ import java.util.List;
  */
 public class FeedFragment extends Fragment implements ProjectCardAdapter.ProjectPreviewClickListener {
 
-	View mView;
+	private View mView;
 
 	public FeedFragment() {
 		// Required empty public constructor
@@ -56,19 +57,6 @@ public class FeedFragment extends Fragment implements ProjectCardAdapter.Project
 					emptySheet.setVisibility(View.VISIBLE);
 
 				for(ProjectEntry project : data) {
-					// TODO: 12.05.2020  
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
-					adapter.addProject(project);
 					adapter.addProject(project);
 				}
 			}
@@ -78,26 +66,20 @@ public class FeedFragment extends Fragment implements ProjectCardAdapter.Project
 		});
 
 		MaterialButton newButton = mView.findViewById(R.id.feed_empty_sheet_new_button);
-		newButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				MainActivity activity = (MainActivity) getActivity();
-				activity.menuController.onClick();
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						activity.menuCreateButton.callOnClick();
-					}
-				}, MenuController.ANIMATION_DURATION);
-			}
+		newButton.setOnClickListener(v -> {
+			MainActivity activity = (MainActivity) getActivity();
+			activity.menuController.onClick();
+			Handler handler = new Handler();
+			handler.postDelayed(() -> activity.menuCreateButton.callOnClick(), MenuController.ANIMATION_DURATION);
 		});
 
 		return mView;
 	}
 
 	@Override
-	public void projectPreviewClick(ProjectEntry project, Pair[] transitionViews) {
-		// TODO: 12.05.2020
+	public void projectPreviewClick(ProjectEntry project) {
+		Intent intent = new Intent(getActivity(), ProjectViewActivity.class);
+		intent.putExtra("project", project);
+		startActivity(intent);
 	}
 }

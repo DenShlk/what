@@ -2,83 +2,80 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="100dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/project_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginHorizontal="4dp"
         android:layout_marginVertical="4dp"
         android:elevation="6dp"
         app:cardCornerRadius="10dp">
 
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/card_preview_image"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_alignParentTop="true"
-                android:background="#D5D5D5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintWidth_percent="0.3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:scaleType="centerCrop"
-                android:transitionName="project_preview_image" />
+                android:src="@mipmap/ic_launcher"/>
+
+            <TextView
+                style="@style/TextAppearance.MaterialComponents.Headline5"
+                android:id="@+id/card_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/card_preview_image"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="10dp"
+                android:text="Title"/>
+
+            <TextView
+                android:id="@+id/card_description_text"
+                style="@style/TextAppearance.MaterialComponents.Body2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:paddingHorizontal="5dp"
+                android:gravity="top"
+                android:text="bla bla bla bla bla bla "
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/card_preview_image"
+                app:layout_constraintTop_toBottomOf="@+id/card_title_text" />
 
             <com.hypersphere.what.views.AnimatedProgressBar
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:id="@+id/card_progress_bar"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_below="@id/card_preview_image"
-                android:progress="0"
-                android:progressBackgroundTint="#80B9F6CA"
-                android:progressTint="#64DD17"
-                android:transitionName="project_progress_bar" />
+                android:layout_width="0dp"
+                android:layout_height="3dp"
+                android:scaleY="2.0"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/card_preview_image" />
 
             <TextView
                 android:id="@+id/card_progress_text"
                 style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/card_title_text"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="10dp"
-                android:gravity="bottom"
-                android:maxLines="1"
-                android:text="$15/100"
-                android:transitionName="project_progress_text" />
+                app:layout_constraintBottom_toTopOf="@+id/card_progress_bar"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingStart="0dp"
+                android:paddingEnd="5dp"
+                android:text="$100/3000"/>
 
-            <TextView
-                android:id="@+id/card_title_text"
-                style="@style/TextAppearance.MaterialComponents.Headline6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/card_progress_bar"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginHorizontal="10dp"
-                android:text="Title"
-                android:transitionName="project_title_text" />
 
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/card_description_text"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/card_title_text"
-                android:layout_marginHorizontal="10dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Description about project can be so long or very long"
-                android:textColor="@color/iconDisabledColor"
-                android:transitionName="project_description_text" />
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     </androidx.cardview.widget.CardView>

@@ -53,7 +53,7 @@ dependencies {
 
     //keyboard state detection library
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:1.0.1'
-    //imageview with zoom and scroll
+    //image view with zoom and scroll
     implementation 'com.github.MikeOrtiz:TouchImageView:3.0.1'
     //working with gif images
     implementation 'com.github.bumptech.glide:glide:3.7.0'
@@ -62,7 +62,7 @@ dependencies {
     //view for timeline
     //was used in progress cards. now it useless :(
     implementation 'com.github.vipulasri:timelineview:1.1.4'
-    //recycler view with overscroll
+    //recycler view with over scroll
     implementation 'com.chauthai.overscroll:overscroll-bouncy:0.1.1'
     //yandex money api
     implementation 'com.yandex.money.api:yandex-money-sdk-android:4.1.4'

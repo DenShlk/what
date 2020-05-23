@@ -9,10 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="2dp"
-        app:cardElevation="2dp"
-        app:contentPadding="8dp"
         app:cardCornerRadius="5dp"
-        app:cardUseCompatPadding="true">
+        app:cardElevation="2dp"
+        app:cardUseCompatPadding="true"
+        app:contentPadding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -32,7 +36,7 @@
                     android:id="@+id/comment_author_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_account_circle_gray_24dp" />
+                    android:src="@drawable/ic_account_circle_gray_24dp"/>
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -49,11 +53,11 @@
                 app:layout_constraintTop_toTopOf="@+id/materialCardView" />
 
             <TextView
-                style="@style/TextAppearance.MaterialComponents.Body1"
                 android:id="@+id/comment_text"
+                style="@style/TextAppearance.MaterialComponents.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="It is really exiting comment! You should read it several times."
+                android:text="Comment text, text about project"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/materialCardView"
                 app:layout_constraintTop_toBottomOf="@+id/materialCardView" />

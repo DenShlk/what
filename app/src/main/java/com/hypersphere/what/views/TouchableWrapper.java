@@ -2,7 +2,6 @@ package com.hypersphere.what.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
@@ -45,13 +44,13 @@ public class TouchableWrapper extends FrameLayout {
 					listener.onCameraMoveEnd();
 					state = STATE_BEFORE;
 				}
-				else
-					if(state==STATE_MOVE && ev.getAction()==MotionEvent.ACTION_MOVE) {}
-					else
+				else {
+					if (state != STATE_MOVE || ev.getAction() != MotionEvent.ACTION_MOVE) {
 						state = STATE_BEFORE;
+					}
+				}
 			}
 		}
-		Log.d("touch state", state + " " + ev.getAction());
 		return super.dispatchTouchEvent(ev);
 	}
 
@@ -60,6 +59,6 @@ public class TouchableWrapper extends FrameLayout {
 	}
 
 	public interface onCameraMoveEndListener{
-		public void onCameraMoveEnd();
+		void onCameraMoveEnd();
 	}
 }

@@ -3,7 +3,6 @@ package com.hypersphere.what.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
-import com.hypersphere.what.Utils;
 import com.hypersphere.what.model.CommentEntry;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.views.AnimatedProgressBar;
@@ -43,10 +41,8 @@ public class ProjectInfoFragment extends Fragment {
 	View mView;
 
 	private TextView infoTitle, infoMoney, infoDescription;
-	private RecyclerView infoGallery;
 	private GalleryRecyclerAdapter infoGalleryAdapter;
 	private AnimatedProgressBar progressBar;
-	private View closeButton;
 	private CloseListener closeListener;
 	private CommentAdapter commentAdapter;
 	private MaterialButton donateButton;
@@ -72,7 +68,7 @@ public class ProjectInfoFragment extends Fragment {
 		infoTitle = mView.findViewById(R.id.info_title_text);
 		infoMoney = mView.findViewById(R.id.info_money_text);
 		infoDescription = mView.findViewById(R.id.info_description);
-		infoGallery = mView.findViewById(R.id.info_image_recycler);
+		RecyclerView infoGallery = mView.findViewById(R.id.info_image_recycler);
 
 		infoGallery.setHasFixedSize(true);
 		infoGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -81,7 +77,7 @@ public class ProjectInfoFragment extends Fragment {
 
 		progressBar = mView.findViewById(R.id.info_progress_bar);
 
-		closeButton = mView.findViewById(R.id.info_close_button);
+		View closeButton = mView.findViewById(R.id.info_close_button);
 		closeButton.setOnClickListener(v -> {
 			if(closeListener!=null)
 				closeListener.onClose();
@@ -99,35 +95,28 @@ public class ProjectInfoFragment extends Fragment {
 		View commentInputLayout = mView.findViewById(R.id.info_add_comment_layout);
 		
 		View addCommentButton = mView.findViewById(R.id.info_add_comment_button);
-		addCommentButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				
-				commentInputLayout.setVisibility(View.VISIBLE);
-				commentText.requestFocus();
+		addCommentButton.setOnClickListener(v -> {
 
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(commentText, InputMethodManager.SHOW_IMPLICIT);
-			}
+			commentInputLayout.setVisibility(View.VISIBLE);
+			commentText.requestFocus();
+
+			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(commentText, InputMethodManager.SHOW_IMPLICIT);
 		});
 		View sendCommentButton = mView.findViewById(R.id.info_send_comment_button);
-		sendCommentButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO: 14.05.2020 cloudmanager work
-				CommentEntry comment = new CommentEntry(CloudManager.getCurUser().id, mProject.id, commentText.getText().toString());
+		sendCommentButton.setOnClickListener(v -> {
+			CommentEntry comment = new CommentEntry(CloudManager.getCurUser().id, mProject.id, commentText.getText().toString());
 
-				CloudManager.newComment(comment);
-				commentAdapter.addComment(comment);
+			CloudManager.newComment(comment);
+			commentAdapter.addComment(comment);
 
-				commentInputLayout.setVisibility(View.GONE);
-				commentText.setText("");
-				commentText.clearFocus();
-				//hide keyboard
-				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(mView.getWindowToken(),
-						InputMethodManager.HIDE_NOT_ALWAYS);
-			}
+			commentInputLayout.setVisibility(View.GONE);
+			commentText.setText("");
+			commentText.clearFocus();
+			//hide keyboard
+			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(mView.getWindowToken(),
+					InputMethodManager.HIDE_NOT_ALWAYS);
 		});
 
 		/*
@@ -154,7 +143,7 @@ public class ProjectInfoFragment extends Fragment {
 
 		infoTitle.setText(project.title);
 		infoDescription.setText(project.description);
-		infoMoney.setText(Utils.getProgressString(project.donationsCollected, project.donationsGoal));
+		infoMoney.setText(ProjectEntry.getProgressString(project.donationsCollected, project.donationsGoal));
 
 		progressBar.setMax(project.donationsGoal);
 		progressBar.setProgress(project.donationsCollected);
@@ -173,7 +162,7 @@ public class ProjectInfoFragment extends Fragment {
 		for (int i = 0; i < project.images.size(); i++) {
 			int finalI = i;
 			CloudManager.loadImage(project.images.get(i), new CloudManager.OnDownloadListener<Bitmap>() {
-				int curI = finalI;
+				final int curI = finalI;
 				@Override
 				public void onComplete(Bitmap data) {
 					infoGalleryAdapter.addImage(data, curI);
@@ -184,51 +173,36 @@ public class ProjectInfoFragment extends Fragment {
 			});
 		}
 
-		donateButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//debug
-				//CloudManager.finishProject(project);
+		donateButton.setOnClickListener(v -> {
 
-				View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.payment_dialog_layout, (ViewGroup) getView(), false);
-				// Set up the input
-				final TextInputEditText input = viewInflated.findViewById(R.id.payment_dialog_amount_input);
-				input.setText(String.valueOf(project.donationsGoal - project.donationsCollected));
+			View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.payment_dialog_layout, (ViewGroup) getView(), false);
+			// Set up the input
+			final TextInputEditText input = viewInflated.findViewById(R.id.payment_dialog_amount_input);
+			input.setText(String.valueOf(project.donationsGoal - project.donationsCollected));
 
-				new MaterialAlertDialogBuilder(getContext())
-						// TODO: 12.05.2020 to dict
-						.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.cancel();
-							}
-						})
-						.setPositiveButton("CONTINUE", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
+			new MaterialAlertDialogBuilder(getContext())
+					.setNegativeButton(getActivity().getString(R.string.payment_dialog_cancel), (dialog, which) -> dialog.cancel())
+					.setPositiveButton(getActivity().getString(R.string.payment_dialog_continue), (dialog, which) -> {
 
-								if (input.getText().toString().isEmpty()) {
-									input.setError("Amount");
-									return;
-								}
+						if (input.getText().toString().isEmpty()) {
+							return;
+						}
 
 
-								payAmount = Double.parseDouble(input.getText().toString());
+						payAmount = Double.parseDouble(input.getText().toString());
 
-								Intent intent = PaymentActivity.getBuilder(getContext())
-										.setPaymentParams(new P2pTransferParams.Builder(project.walletId)
-												.setAmount(new BigDecimal(payAmount))
-												.create())
-										.setClientId(CLIENT_ID)
-										.setHost(HOST)
-										.build();
-								startActivityForResult(intent, REQUEST_CODE_YANDEX_PAYMENT);
-							}
-						})
-						.setTitle("Donation amount")
-						.setView(viewInflated)
-						.show();
-			}
+						Intent intent = PaymentActivity.getBuilder(getContext())
+								.setPaymentParams(new P2pTransferParams.Builder(project.walletId)
+										.setAmount(new BigDecimal(payAmount))
+										.create())
+								.setClientId(CLIENT_ID)
+								.setHost(HOST)
+								.build();
+						startActivityForResult(intent, REQUEST_CODE_YANDEX_PAYMENT);
+					})
+					.setTitle(getActivity().getString(R.string.payment_dialog_title))
+					.setView(viewInflated)
+					.show();
 		});
 
 	}
@@ -251,7 +225,7 @@ public class ProjectInfoFragment extends Fragment {
 	}
 
 	public interface CloseListener {
-		public void onClose();
+		void onClose();
 	}
 
 }

@@ -28,22 +28,17 @@ public class MenuController implements View.OnClickListener {
 
     private final AnimatorSet animatorSet = new AnimatorSet();
     private final AnimationSet animationSet = new AnimationSet(false);  //i like these 2 lines
-    private Activity activity;
-    private View sheet;
-    private Toolbar toolbar;
+    private final Activity activity;
+    private final View sheet;
     private ImageView navigationIcon;
-    private Interpolator interpolator;
+    private final Interpolator interpolator;
     private int height, width;
     public boolean menuShown = false;
-    private Drawable openIcon;
-    private Drawable closeIcon;
-    private View backgroundButton;
+    private final Drawable openIcon;
+    private final Drawable closeIcon;
+    private final View backgroundButton;
 
-    MenuController(Activity activity, View sheet, Toolbar toolbar) {
-        this(activity, sheet, toolbar, null);
-    }
-
-    MenuController(Activity activity, View sheet, Toolbar toolbar, @Nullable Interpolator interpolator) {
+    private MenuController(Activity activity, View sheet, Toolbar toolbar, @Nullable Interpolator interpolator) {
         this(activity, sheet, toolbar, interpolator, null, null);
     }
 
@@ -69,12 +64,9 @@ public class MenuController implements View.OnClickListener {
         }
 
         backgroundButton = activity.findViewById(R.id.background_button);
-        backgroundButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(menuShown)
-                   MenuController.this.onClick();
-            }
+        backgroundButton.setOnClickListener(v -> {
+            if(menuShown)
+               MenuController.this.onClick();
         });
     }
 
@@ -127,7 +119,7 @@ public class MenuController implements View.OnClickListener {
 
     private void updateIcon() {
         if (openIcon != null && closeIcon != null) {
-            if (!(navigationIcon instanceof ImageView)) {
+            if (navigationIcon == null) {
                 throw new IllegalArgumentException("updateIcon() must be called on an ImageView");
             }
             if (menuShown) {

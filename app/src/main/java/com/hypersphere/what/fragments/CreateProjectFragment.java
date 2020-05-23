@@ -26,7 +26,6 @@ import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.views.EditableGalleryRecyclerAdapter;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 
 public class CreateProjectFragment extends Fragment {
@@ -35,7 +34,6 @@ public class CreateProjectFragment extends Fragment {
 	private boolean locationRequested = false;
 
 	private View mView;
-	private RecyclerView imageRecycler;
 	private EditableGalleryRecyclerAdapter galleryAdapter;
 	private FloatingActionButton acceptButton;
 	private TextInputEditText locationInput;
@@ -55,7 +53,7 @@ public class CreateProjectFragment extends Fragment {
 	                         Bundle savedInstanceState) {
 		mView = inflater.inflate(R.layout.fragment_create_project, container, false);
 
-		imageRecycler = mView.findViewById(R.id.image_recycler);
+		RecyclerView imageRecycler = mView.findViewById(R.id.image_recycler);
 		imageRecycler.hasFixedSize();
 		imageRecycler.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
 
@@ -71,78 +69,69 @@ public class CreateProjectFragment extends Fragment {
 
 
 		locationInput = mView.findViewById(R.id.location_edit_text);
-		locationInput.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (locationRequested)
-					return;
-				locationRequested = true;
+		locationInput.setOnClickListener(v -> {
+			if (locationRequested)
+				return;
+			locationRequested = true;
 
-				locationInput.clearFocus();
+			locationInput.clearFocus();
 
-				Intent intent = new Intent(getActivity(), LocationSelectActivity.class);
-				if (locationInput.getText().length() > 0) {
-					intent.putExtra("lastAddress", locationInput.getText().toString());
-					intent.putExtra("lat", latitude);
-					intent.putExtra("lon", longitude);
-				}
-
-				startActivityForResult(intent, REQUEST_LOCATION);
+			Intent intent = new Intent(getActivity(), LocationSelectActivity.class);
+			if (locationInput.getText().length() > 0) {
+				intent.putExtra("lastAddress", locationInput.getText().toString());
+				intent.putExtra("lat", latitude);
+				intent.putExtra("lon", longitude);
 			}
+
+			startActivityForResult(intent, REQUEST_LOCATION);
 		});
 
 		KeyboardVisibilityEvent.setEventListener(
 				getActivity(),
-				new KeyboardVisibilityEventListener() {
-					@Override
-					public void onVisibilityChanged(boolean isOpen) {
-						if (isOpen)
-							acceptButton.hide();
-						else
-							acceptButton.show();
-					}
+				isOpen -> {
+					if (isOpen)
+						acceptButton.hide();
+					else
+						acceptButton.show();
 				});
 
-		mView.findViewById(R.id.accept_button).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				ProjectEntry project = new ProjectEntry(
-						"",
-						titleInput.getText().toString(),
-						descriptionInput.getText().toString(),
-						Double.parseDouble(moneyGoalInput.getText().toString()),
-						Double.parseDouble(moneyInvestInput.getText().toString()),
-						latitude,
-						longitude,
-						null,
-						CloudManager.getCurUser().id,
-						moneyWalletInput.getText().toString()
-				);
+		mView.findViewById(R.id.accept_button).setOnClickListener(v -> {
+			ProjectEntry project = new ProjectEntry(
+					"",
+					titleInput.getText().toString(),
+					descriptionInput.getText().toString(),
+					Double.parseDouble(moneyGoalInput.getText().toString()),
+					Double.parseDouble(moneyInvestInput.getText().toString()),
+					latitude,
+					longitude,
+					null,
+					CloudManager.getCurUser().id,
+					moneyWalletInput.getText().toString()
+			);
 
 
-				final Dialog loadingDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent);
-				loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-				loadingDialog.setCancelable(false);
-				loadingDialog.setContentView(R.layout.loading_dialog_layout);
-				ImageView imageView = loadingDialog.findViewById(R.id.loading_image_view);
-				Glide.with(getContext())
-						.load(R.drawable.loading_drawable)
-						.placeholder(R.drawable.loading_drawable)
-						.fitCenter()
-						.into(imageView);
+			final Dialog loadingDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent);
+			loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			loadingDialog.setCancelable(false);
+			loadingDialog.setContentView(R.layout.loading_dialog_layout);
+			ImageView imageView = loadingDialog.findViewById(R.id.loading_image_view);
+			Glide.with(getContext())
+					.load(R.drawable.loading_drawable)
+					.placeholder(R.drawable.loading_drawable)
+					.fitCenter()
+					.into(imageView);
 
-				loadingDialog.show();
+			loadingDialog.show();
 
-				CloudManager.newProject(project, galleryAdapter.getImages(), new CloudManager.OnUploadListener() {
-					@Override
-					public void onComplete() {
-						loadingDialog.dismiss();
-					}
+			CloudManager.newProject(project, galleryAdapter.getImages(), new CloudManager.OnUploadListener() {
+				@Override
+				public void onComplete() {
+					loadingDialog.dismiss();
+				}
 
-					@Override
-					public void onCancel() {}
-				});
-			}
+				@Override
+				public void onCancel() {}
+			});
 		});
 
 		return mView;

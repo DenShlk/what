@@ -2,12 +2,12 @@ package com.hypersphere.what.fragments;
 
 
 import android.Manifest;
-import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -62,13 +61,11 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 	private double myLongitude;
 
 	private MaterialCardView infoCard;
-	private AnimatorSet infoCardAnimationSet = new AnimatorSet();
 	private boolean focusedOnMarker = false;
 
 	private LocationManager locationManager;
-	private String locationProvider = LocationManager.GPS_PROVIDER;
 
-	private Map<Marker, ProjectEntry> markerProjectMap = new HashMap<>();
+	private final Map<Marker, ProjectEntry> markerProjectMap = new HashMap<>();
 
 	private List<ProjectEntry> projects;
 
@@ -94,13 +91,10 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 		infoFragment = new ProjectInfoFragment();
 
-		infoFragment.setCloseListener(new ProjectInfoFragment.CloseListener() {
-			@Override
-			public void onClose() {
-				focusedOnMarker = false;
-				infoBehaviour.setHideable(true);
-				infoBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
-			}
+		infoFragment.setCloseListener(() -> {
+			focusedOnMarker = false;
+			infoBehaviour.setHideable(true);
+			infoBehaviour.setState(BottomSheetBehavior.STATE_HIDDEN);
 		});
 
 		infoCard = mView.findViewById(R.id.info_card);
@@ -140,22 +134,12 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 	}
 
 	private void setUpButtons(){
-		mView.findViewById(R.id.my_position_button).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition()));
-			}
-		});
+		mView.findViewById(R.id.my_position_button).setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition())));
 
 		final Handler handler = new Handler();
 
 		final View zoomInButton = mView.findViewById(R.id.zoom_in_button);
-		zoomInButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-			}
-		});
+		zoomInButton.setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.zoomIn()));
 		final Runnable zoomInAction = new Runnable() {
 			@Override
 			public void run() {
@@ -163,31 +147,20 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 				handler.postDelayed(this, 100);
 			}
 		};
-		zoomInButton.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				handler.post(zoomInAction);
-				return true;
-			}
+		zoomInButton.setOnLongClickListener(v -> {
+			handler.post(zoomInAction);
+			return true;
 		});
-		zoomInButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					handler.removeCallbacks(zoomInAction);
-					//return true;
-				}
-				return false;
+		zoomInButton.setOnTouchListener((v, event) -> {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				handler.removeCallbacks(zoomInAction);
+				v.performClick();
 			}
+			return false;
 		});
 
 		final View zoomOutButton = mView.findViewById(R.id.zoom_out_button);
-		zoomOutButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.zoomOut());
-			}
-		});
+		zoomOutButton.setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.zoomOut()));
 		final Runnable zoomOutAction = new Runnable() {
 			@Override
 			public void run() {
@@ -195,22 +168,16 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 				handler.postDelayed(this, 100);
 			}
 		};
-		zoomOutButton.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				handler.post(zoomOutAction);
-				return true;
-			}
+		zoomOutButton.setOnLongClickListener(v -> {
+			handler.post(zoomOutAction);
+			return true;
 		});
-		zoomOutButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					handler.removeCallbacks(zoomOutAction);
-					//return true;
-				}
-				return false;
+		zoomOutButton.setOnTouchListener((v, event) -> {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				handler.removeCallbacks(zoomOutAction);
+				v.performClick();
 			}
+			return false;
 		});
 	}
 
@@ -229,7 +196,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		if (requestCode == LOCATION_REQUEST) {
 			if (!hasGPSPermission()) {
 				// TODO: 15.05.2020
-				Toast.makeText(getContext(), "All right, then. Keep your secrets.", Toast.LENGTH_LONG).show();
 				setUpMap();
 			} else {
 				if (waitPermissionForMap) {
@@ -271,37 +237,26 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 			public void onCancel() {}
 		});
 
-		googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-			@Override
-			public boolean onMarkerClick(Marker marker) {
-				// TODO: 27.04.2020
-				//load info from marker from project
+		googleMap.setOnMarkerClickListener(marker -> {
 
-				final ProjectEntry project = markerProjectMap.get(marker);
-				infoFragment.fillInfo(project);
+			final ProjectEntry project = markerProjectMap.get(marker);
+			infoFragment.fillInfo(project);
 
-				if(!focusedOnMarker)
-					changeFocusedOnMarker();
+			if(!focusedOnMarker)
+				changeFocusedOnMarker();
 
-				return false;
-			}
+			return false;
 		});
 
-		googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-			@Override
-			public void onCameraMoveStarted(int i) {
-				if(i==1){// move from user
-					if(focusedOnMarker)
-						changeFocusedOnMarker();
-				}
-			}
-		});
-		googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-			@Override
-			public void onMapClick(LatLng latLng) {
+		googleMap.setOnCameraMoveStartedListener(i -> {
+			if(i==1){// move from user
 				if(focusedOnMarker)
 					changeFocusedOnMarker();
 			}
+		});
+		googleMap.setOnMapClickListener(latLng -> {
+			if(focusedOnMarker)
+				changeFocusedOnMarker();
 		});
 
 	}
@@ -356,6 +311,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		if (!hasGPSPermission())
 			return null;
 
+		String locationProvider = LocationManager.GPS_PROVIDER;
 		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 		myLatitude = lastKnownLocation.getLatitude();
 		myLongitude = lastKnownLocation.getLongitude();
@@ -366,29 +322,22 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		return (PackageManager.PERMISSION_GRANTED == getContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 	}
 
-	private Marker addProjectMarker(ProjectEntry project){
+	private void addProjectMarker(ProjectEntry project){
 		View markerView = ((LayoutInflater) getActivity()
 				.getSystemService(
-						getActivity().LAYOUT_INFLATER_SERVICE))
+						Context.LAYOUT_INFLATER_SERVICE))
 				.inflate(R.layout.project_marker_layout, null);
 
 		View progressView = markerView.findViewById(R.id.marker_progress_image);
-		//// TODO: 29.04.2020 maxSize to dimens
-		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-		//40dp to px...
-		float maxHeight = displayMetrics.density * 40;
+
+		//max height of image
+		BitmapDrawable bd = (BitmapDrawable) this.getResources().getDrawable(R.drawable.ic_location_on_progress_40dp, getContext().getTheme());
+		float maxHeight = bd.getBitmap().getHeight();
 		progressView.getLayoutParams().height = (int) (maxHeight * (1 - project.donationsCollected / project.donationsGoal));
 		progressView.requestLayout();
 
-		TextView titleTextLeft = markerView.findViewById(R.id.marker_title_left);
-		titleTextLeft.setText(project.title);
-		TextView titleTextRight = markerView.findViewById(R.id.marker_title_right);
-		titleTextRight.setText(project.title);
-
-		//View bottomView = markerView.findViewById(R.id.marker_bottom_view);
-		//if more then 60% completed
-		//if(project.donationsCollected >= project.donationsGoal * 0.60)
-		//	bottomView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.progressColor));
+		TextView titleText = markerView.findViewById(R.id.marker_title);
+		titleText.setText(project.title);
 
 		Marker marker = googleMap.addMarker(new MarkerOptions()
 				.position(new LatLng(project.latitude, project.longitude))
@@ -398,7 +347,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 		markerProjectMap.put(marker, project);
 
-		return marker;
 	}
 
 	private Bitmap createDrawableFromView(View view) {
@@ -422,7 +370,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO: 27.04.2020
+
 	}
 
 	@Override

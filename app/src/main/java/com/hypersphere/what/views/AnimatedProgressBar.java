@@ -26,6 +26,7 @@ public class AnimatedProgressBar extends ProgressBar {
 	public AnimatedProgressBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 		setMax(resolution);
+		setProgress(0);
 	}
 
 	private int resolution = 1000;
@@ -80,12 +81,12 @@ public class AnimatedProgressBar extends ProgressBar {
 		}
 	}
 
-	public static class ProgressAnimation extends Animation {
-		private double from;
-		private double to;
-		private AnimatedProgressBar progressBar;
+	static class ProgressAnimation extends Animation {
+		private final double from;
+		private final double to;
+		private final AnimatedProgressBar progressBar;
 
-		public ProgressAnimation(AnimatedProgressBar progressBar, double from, double to) {
+		ProgressAnimation(AnimatedProgressBar progressBar, double from, double to) {
 			this.from = from;
 			this.to = to;
 			this.progressBar = progressBar;

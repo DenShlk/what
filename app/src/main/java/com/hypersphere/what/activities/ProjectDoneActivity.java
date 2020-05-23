@@ -3,7 +3,6 @@ package com.hypersphere.what.activities;
 
 import android.os.Bundle;
 import android.util.Pair;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -24,12 +23,7 @@ public class ProjectDoneActivity extends AppCompatActivity {
 		ViewGroup mainLayout = findViewById(R.id.activity_done_main_layout);
 
 		MaterialButton button = findViewById(R.id.ok_button);
-		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
+		button.setOnClickListener(v -> finish());
 
 		TextView textView = findViewById(R.id.done_text_view);
 

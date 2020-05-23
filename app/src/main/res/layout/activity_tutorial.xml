@@ -46,7 +46,7 @@
             android:id="@+id/tutor_skip_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="skip"
+            android:text="@string/tutorial_skip"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tutor_dots_indicator"
             app:layout_constraintStart_toStartOf="parent" />
@@ -57,7 +57,7 @@
             android:id="@+id/tutor_next_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="next"
+            android:text="@string/tutorial_next"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tutor_dots_indicator" />

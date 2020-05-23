@@ -58,10 +58,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
 	class CommentViewHolder extends RecyclerView.ViewHolder {
 
-		private TextView authorText, commentText;
-		private ImageView authorImage;
+		private final TextView authorText;
+		private final TextView commentText;
+		private final ImageView authorImage;
 
-		public CommentViewHolder(@NonNull View itemView) {
+		CommentViewHolder(@NonNull View itemView) {
 			super(itemView);
 
 			authorText = itemView.findViewById(R.id.comment_author_name);
@@ -69,7 +70,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 			authorImage = itemView.findViewById(R.id.comment_author_image);
 		}
 
-		public void setComment(CommentEntry comment){
+		void setComment(CommentEntry comment){
 			commentText.setText(comment.text);
 			CloudManager.getUser(comment.authorId, new CloudManager.OnDownloadListener<UserEntry>() {
 				@Override

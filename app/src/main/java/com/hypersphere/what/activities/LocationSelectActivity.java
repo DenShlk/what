@@ -11,13 +11,11 @@ import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,14 +40,12 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 	private static final String[] LOCATION_PERMS = {
 			Manifest.permission.ACCESS_FINE_LOCATION
 	};
-	private boolean waitPermissionForMap = false;
 
 	private GoogleMap googleMap;
 	private double myLatitude;
 	private double myLongitude;
 
 	private LocationManager locationManager;
-	private String locationProvider = LocationManager.GPS_PROVIDER;
 
 	private EditText addressInput;
 	private TouchableWrapper wrapper;
@@ -65,12 +61,9 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		wrapper = findViewById(R.id.map_wrapper);
 
 		Toolbar toolbar = findViewById(R.id.app_bar);
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				setResult(RESULT_CANCELED, new Intent());
-				finish();
-			}
+		toolbar.setNavigationOnClickListener(v -> {
+			setResult(RESULT_CANCELED, new Intent());
+			finish();
 		});
 
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -81,75 +74,51 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 
 		addressInput = findViewById(R.id.location_edit_text);
 
-		findViewById(R.id.clear_button).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				addressInput.setText("");
-			}
-		});
+		findViewById(R.id.clear_button).setOnClickListener(v -> addressInput.setText(""));
 
 		searchButton = findViewById(R.id.search_button);
-		searchButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (addressInput.getText().length() > 0) {
-					LatLng loc = getLocationFromAddress(String.valueOf(addressInput.getText()));
-					if (loc != null) {
-						googleMap.animateCamera(CameraUpdateFactory.newLatLng(loc));
-						addressInput.clearFocus();
+		searchButton.setOnClickListener(v -> {
+			if (addressInput.getText().length() > 0) {
+				LatLng loc = getLocationFromAddress(String.valueOf(addressInput.getText()));
+				if (loc != null) {
+					googleMap.animateCamera(CameraUpdateFactory.newLatLng(loc));
+					addressInput.clearFocus();
 
-						//hide keyboard
-						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(addressInput.getWindowToken(),
-								InputMethodManager.HIDE_NOT_ALWAYS);
-					}
+					//hide keyboard
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(addressInput.getWindowToken(),
+							InputMethodManager.HIDE_NOT_ALWAYS);
 				}
 			}
 		});
 
-		addressInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE ||
-						actionId == EditorInfo.IME_ACTION_GO ||
-						actionId == EditorInfo.IME_ACTION_NEXT) {
-					searchButton.callOnClick();
-					return true;
-				}
-				return false;
+		addressInput.setOnEditorActionListener((v, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE ||
+					actionId == EditorInfo.IME_ACTION_GO ||
+					actionId == EditorInfo.IME_ACTION_NEXT) {
+				searchButton.callOnClick();
+				return true;
 			}
+			return false;
 		});
 
-		findViewById(R.id.accept_button).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent data = new Intent();
-				data.putExtra("lat", googleMap.getCameraPosition().target.latitude);
-				data.putExtra("lon", googleMap.getCameraPosition().target.longitude);
-				data.putExtra("address", getAddressFromLocation(googleMap.getCameraPosition().target));
-				setResult(Activity.RESULT_OK, data);
-				finish();
-			}
+		findViewById(R.id.accept_button).setOnClickListener(v -> {
+			Intent data = new Intent();
+			data.putExtra("lat", googleMap.getCameraPosition().target.latitude);
+			data.putExtra("lon", googleMap.getCameraPosition().target.longitude);
+			data.putExtra("address", getAddressFromLocation(googleMap.getCameraPosition().target));
+			setResult(Activity.RESULT_OK, data);
+			finish();
 		});
 	}
 
 	private void setUpButtons(){
-		findViewById(R.id.my_position_button).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition()));
-			}
-		});
+		findViewById(R.id.my_position_button).setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition())));
 
 		final Handler handler = new Handler();
 
 		final View zoomInButton = findViewById(R.id.zoom_in_button);
-		zoomInButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.zoomIn());
-			}
-		});
+		zoomInButton.setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.zoomIn()));
 		final Runnable zoomInAction = new Runnable() {
 			@Override
 			public void run() {
@@ -157,31 +126,21 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 				handler.postDelayed(this, 100);
 			}
 		};
-		zoomInButton.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				handler.post(zoomInAction);
-				return true;
-			}
+		zoomInButton.setOnLongClickListener(v -> {
+			handler.post(zoomInAction);
+			return true;
 		});
-		zoomInButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					handler.removeCallbacks(zoomInAction);
-					//return true;
-				}
-				return false;
+		zoomInButton.setOnTouchListener((v, event) -> {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				handler.removeCallbacks(zoomInAction);
+				v.performClick();
+				//return true;
 			}
+			return false;
 		});
 
 		final View zoomOutButton = findViewById(R.id.zoom_out_button);
-		zoomOutButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				googleMap.animateCamera(CameraUpdateFactory.zoomOut());
-			}
-		});
+		zoomOutButton.setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.zoomOut()));
 		final Runnable zoomOutAction = new Runnable() {
 			@Override
 			public void run() {
@@ -189,30 +148,25 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 				handler.postDelayed(this, 100);
 			}
 		};
-		zoomOutButton.setOnLongClickListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				handler.post(zoomOutAction);
-				return true;
-			}
+		zoomOutButton.setOnLongClickListener(v -> {
+			handler.post(zoomOutAction);
+			return true;
 		});
-		zoomOutButton.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					handler.removeCallbacks(zoomOutAction);
-					//return true;
-				}
-				return false;
+		zoomOutButton.setOnTouchListener((v, event) -> {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				handler.removeCallbacks(zoomOutAction);
+				v.performClick();
+				//return true;
 			}
+			return false;
 		});
 	}
 
-	public LatLng getLocationFromAddress(String strAddress) {
+	private LatLng getLocationFromAddress(String strAddress) {
 
 		Geocoder geocoder = new Geocoder(this);
 		List<Address> address;
-		LatLng p1 = null;
+		LatLng p1;
 
 		try {
 			address = geocoder.getFromLocationName(strAddress, 5);
@@ -233,11 +187,10 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		}
 	}
 
-	public String getAddressFromLocation(LatLng location) {
+	private String getAddressFromLocation(LatLng location) {
 
 		Geocoder geocoder = new Geocoder(this);
 		List<Address> addresses;
-		LatLng p1 = null;
 
 		try {
 			addresses = geocoder.getFromLocation(location.latitude, location.longitude, 5);
@@ -248,12 +201,12 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 			address.getLatitude();
 			address.getLongitude();
 
-			String text = address.getAddressLine(0);
+			StringBuilder text = new StringBuilder(address.getAddressLine(0));
 			for (int i = 1; i < address.getMaxAddressLineIndex(); i++) {
-				text += ", " + address.getAddressLine(i);
+				text.append(", ").append(address.getAddressLine(i));
 			}
 
-			return text;
+			return text.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
@@ -321,25 +274,19 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		googleMap.getUiSettings().setMapToolbarEnabled(false);
 
 
-		wrapper.setListener(new TouchableWrapper.onCameraMoveEndListener() {
-			@Override
-			public void onCameraMoveEnd() {
+		wrapper.setListener(() -> {
 
-				final LatLng pos = googleMap.getCameraPosition().target;
-				(new Thread() {
-					@Override
-					public void run() {
-						final String address = getAddressFromLocation(pos);
-						handler.post(new Runnable() {
-							@Override
-							public void run() {
-								if (address != null)
-									addressInput.setText(address);
-							}
-						});
-					}
-				}).start();
-			}
+			final LatLng pos = googleMap.getCameraPosition().target;
+			(new Thread() {
+				@Override
+				public void run() {
+					final String address = getAddressFromLocation(pos);
+					handler.post(() -> {
+						if (address != null)
+							addressInput.setText(address);
+					});
+				}
+			}).start();
 		});
 
 		if (getIntent().hasExtra("lastAddress")) {
@@ -357,6 +304,7 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		if (!hasGPSPermission())
 			return null;
 
+		String locationProvider = LocationManager.GPS_PROVIDER;
 		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
 		myLatitude = lastKnownLocation.getLatitude();
 		myLongitude = lastKnownLocation.getLongitude();

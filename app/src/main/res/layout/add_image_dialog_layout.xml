@@ -15,7 +15,7 @@
         style="@style/TextAppearance.MaterialComponents.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add new photo"/>
+        android:text="@string/dialog_add_new_photo"/>
 
     <LinearLayout
         android:id="@+id/dialog_take_photo"
@@ -30,15 +30,15 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_photo_camera_gray_24dp" />
+            app:srcCompat="@drawable/ic_photo_camera_gray_24dp"/>
 
         <TextView
             style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="Take a photo" />
+            android:layout_marginStart="16dp"
+            android:text="@string/dialog_take_a_photo" />
     </LinearLayout>
 
     <LinearLayout
@@ -54,14 +54,14 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@drawable/ic_photo_library_gray_24dp" />
+            app:srcCompat="@drawable/ic_photo_library_gray_24dp"/>
 
         <TextView
             style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:text="Open from gallery" />
+            android:layout_marginStart="16dp"
+            android:text="@string/dialog_open_from_gallery" />
     </LinearLayout>
 </LinearLayout>

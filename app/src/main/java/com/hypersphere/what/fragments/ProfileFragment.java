@@ -1,8 +1,8 @@
 package com.hypersphere.what.fragments;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,26 +17,25 @@ import androidx.recyclerview.widget.SnapHelper;
 
 import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.activities.ProjectViewActivity;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.views.ProjectCardAdapter;
 
 import java.util.List;
 
-import static com.hypersphere.what.Utils.getProjects;
 
 public class ProfileFragment extends Fragment {
 
 
-	private ProjectCardAdapter.ProjectPreviewClickListener projectPreviewClickListener;
+	private final ProjectCardAdapter.ProjectPreviewClickListener projectPreviewClickListener;
 
 	private View mView;
 
 	public ProfileFragment() {
-		projectPreviewClickListener = new ProjectCardAdapter.ProjectPreviewClickListener() {
-			@Override
-			public void projectPreviewClick(ProjectEntry project, Pair[] transitionViews) {
-				// TODO: 15.05.2020 start activity
-			}
+		projectPreviewClickListener = project -> {
+			Intent intent = new Intent(getActivity(), ProjectViewActivity.class);
+			intent.putExtra("project", project);
+			startActivity(intent);
 		};
 	}
 
@@ -51,7 +50,7 @@ public class ProfileFragment extends Fragment {
 		SnapHelper pagerSnap = new PagerSnapHelper();
 		pagerSnap.attachToRecyclerView(activeRecycler);
 
-		final ProjectCardAdapter activeAdapter = new ProjectCardAdapter(getProjects(0), projectPreviewClickListener);
+		final ProjectCardAdapter activeAdapter = new ProjectCardAdapter(projectPreviewClickListener);
 		for(String projectId : CloudManager.getCurUser().myProjects){
 			CloudManager.loadProject(projectId, new CloudManager.OnDownloadListener<ProjectEntry>() {
 				@Override
@@ -63,6 +62,11 @@ public class ProfileFragment extends Fragment {
 				public void onCancel() {}
 			});
 		}
+		if(CloudManager.getCurUser().myProjects.size()==0){
+			TextView text = mView.findViewById(R.id.profile_my_active_projects_text);
+			text.setText(getResources().getString(R.string.profile_no_active_projects));
+			activeRecycler.setVisibility(View.INVISIBLE);
+		}
 		activeRecycler.setAdapter(activeAdapter);
 
 		RecyclerView finishedRecycler = mView.findViewById(R.id.profile_finished_recycler);
@@ -71,12 +75,17 @@ public class ProfileFragment extends Fragment {
 		SnapHelper pagerSnap2 = new PagerSnapHelper();
 		pagerSnap2.attachToRecyclerView(finishedRecycler);
 
-		final ProjectCardAdapter finishedAdapter = new ProjectCardAdapter(getProjects(0), projectPreviewClickListener);
+		final ProjectCardAdapter finishedAdapter = new ProjectCardAdapter(projectPreviewClickListener);
 		CloudManager.loadProjectsDone(new CloudManager.OnDownloadListener<List<ProjectEntry>>() {
 			@Override
 			public void onComplete(List<ProjectEntry> data) {
 				for(ProjectEntry project : data)
 					finishedAdapter.addProject(project);
+				if(data.size() == 0){
+					TextView text = mView.findViewById(R.id.profile_my_finished_projects_text);
+					text.setText(getResources().getString(R.string.profile_no_finished_projects));
+					finishedRecycler.setVisibility(View.INVISIBLE);
+				}
 			}
 
 			@Override
@@ -95,11 +104,8 @@ public class ProfileFragment extends Fragment {
 			@Override
 			public void onCancel() {}
 		});
-		userImageView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO: 12.05.2020 change image
-			}
+		userImageView.setOnClickListener(v -> {
+			// TODO: 12.05.2020 change image
 		});
 
 		TextView nickText = mView.findViewById(R.id.profile_nick_text);
