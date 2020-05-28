@@ -1,3 +1,17 @@
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.hypersphere.what.activities;
 
 import android.animation.TimeInterpolator;
@@ -14,15 +28,14 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
-import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.CloudHelper;
 
+/**
+ * Provides an interface for the user to log in or register
+ * When user change mode (log in / register) starts animations.
+ */
 public class LoginActivity extends AppCompatActivity {
-
-	private static final int LOGIN_MODE = 1;
-	private static final int SIGN_MODE = 2;
-
-	private int mode = SIGN_MODE;
 
 	private Animation toLeft;
 	private Animation toRight;
@@ -78,20 +91,35 @@ public class LoginActivity extends AppCompatActivity {
 		});
 	}
 
+	/**
+	 * Checks email correctness.
+	 *
+	 * @param email
+	 * @return true if email is correct.
+	 */
 	private boolean checkEmail(String email) {
 		return email.matches(".+@.+\\..+");
 	}
 
+	/**
+	 * Checks password correctness (syntactically like not empty, it isn't connect to server).
+	 * @param password
+	 * @return true if password is correct.
+	 */
 	private boolean checkPassword(String password) {
 		return password.length() >= 6;
 	}
 
+	/**
+	 * Tries to login with entered email and password. Firstly checks their correctness.
+	 * @param v
+	 */
 	public void loginClick(View v) {
 		String email = loginUserId.getEditText().getText().toString();
 		String password = loginPassword.getEditText().getText().toString();
 
 		if (checkEmail(email) && checkPassword(password))
-			CloudManager.login(email, password, new CloudManager.OnAuthListener() {
+			CloudHelper.login(email, password, new CloudHelper.OnAuthListener() {
 				@Override
 				public void onSuccess() {
 					navigateToNext(false);
@@ -108,14 +136,16 @@ public class LoginActivity extends AppCompatActivity {
 		}
 	}
 
+	/**
+	 * Tries to register with entered username, email and password. Firstly checks their correctness.
+	 * @param v
+	 */
 	public void signClick(View v) {
 		String username = signUsername.getEditText().getText().toString();
 		String email = signEmail.getEditText().getText().toString();
 		String password = signPassword.getEditText().getText().toString();
-
-
 		if (checkEmail(email) && checkPassword(password)) {
-			CloudManager.sign(username, email, password, new CloudManager.OnAuthListener() {
+			CloudHelper.sign(username, email, password, new CloudHelper.OnAuthListener() {
 				@Override
 				public void onSuccess() {
 					navigateToNext(true);
@@ -131,6 +161,11 @@ public class LoginActivity extends AppCompatActivity {
 			errorAnimate();
 	}
 
+	/**
+	 * Starts next activity. If user was registered it {@link TutorialActivity} and
+	 * {@link MainActivity} otherwise.
+	 * @param isNewUser true if user was registered or false if user was logged
+	 */
 	private void navigateToNext(boolean isNewUser) {
 		Intent intent;
 		if(isNewUser)
@@ -141,6 +176,9 @@ public class LoginActivity extends AppCompatActivity {
 		finish();
 	}
 
+	/**
+	 * Starts shake animation on input fields.
+	 */
 	private void errorAnimate() {
 		final float FREQ = 1.6f;
 		final float DECAY = 1.1f;
@@ -159,8 +197,11 @@ public class LoginActivity extends AppCompatActivity {
 				.start();
 	}
 
+	/**
+	 * Starts transition to register mode.
+	 * @param view
+	 */
 	public void newUserClick(View view) {
-		mode = SIGN_MODE;
 		loginUserId.startAnimation(toLeft);
 		loginPassword.startAnimation(toRight);
 		loginButtons.startAnimation(toLeft);
@@ -182,8 +223,11 @@ public class LoginActivity extends AppCompatActivity {
 		}, 250);
 	}
 
+	/**
+	 * Starts transition to log in mode.
+	 * @param view
+	 */
 	public void haveAccountClick(View view) {
-		mode = LOGIN_MODE;
 		signUsername.startAnimation(toRight);
 		signEmail.startAnimation(toLeft);
 		signPassword.startAnimation(toRight);

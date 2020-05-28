@@ -1,9 +1,20 @@
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.hypersphere.what.activities;
 
-
 import android.os.Bundle;
-import android.util.Pair;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,8 +22,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.hypersphere.what.R;
 
-import java.util.Random;
-
+/**
+ * Activity for congratulate user with project finishing.
+ */
 public class ProjectDoneActivity extends AppCompatActivity {
 
 	@Override
@@ -20,56 +32,14 @@ public class ProjectDoneActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_done);
 
-		ViewGroup mainLayout = findViewById(R.id.activity_done_main_layout);
-
 		MaterialButton button = findViewById(R.id.ok_button);
 		button.setOnClickListener(v -> finish());
 
 		TextView textView = findViewById(R.id.done_text_view);
 
+		//put project name to congratulation text
 		String name = getIntent().getExtras().get("projectName").toString();
 		String text = textView.getText().toString().replace("1234567890", name);
 		textView.setText(text);
-
-		//someone said it looks obsolete
-		/*
-		Handler handler = new Handler();
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-			Pair<Integer, Integer> last = new Pair<>(0, 0);
-			@Override
-			public void run() {
-
-				if(mainLayout.getWidth() > 0) {
-					Pair<Integer, Integer> p = generateRandPoint(mainLayout.getWidth(), mainLayout.getHeight());
-					while(distanceP2P(p, last) < 100)
-						p = generateRandPoint(mainLayout.getWidth(), mainLayout.getHeight());
-
-					int[] colors = new int[]{Color.BLUE, Color.CYAN, Color.GREEN, Color.YELLOW, Color.RED, Color.MAGENTA, Color.BLUE};
-
-					Pair<Integer, Integer> finalP = p;
-					handler.post(() -> CommonConfetti.explosion(mainLayout, finalP.first, finalP.second, colors).oneShot());
-				}
-			}
-		}, 0, 300);
-		 */
-	}
-	
-	Pair<Integer, Integer> generateRandPoint(int w, int h){
-
-		Random random = new Random();int x = Math.abs(random.nextInt()) % w, y = Math.abs(random.nextInt()) % h;
-
-		if(x > w * 0.8)
-			x = (int) (w * 0.8);
-		if(x < w * 0.2)
-			x = (int) (w * 0.2);
-		if(y > h * 0.8)
-			y = (int) (h * 0.8);
-		if(y < h * 0.2)
-			y = (int) (h * 0.2);
-		return new Pair<>(x, y);
-	}
-
-	double distanceP2P(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-		return Math.sqrt(Math.pow(a.first - b.first, 2) +Math.pow(a.second - b.second, 2));
 	}
 }

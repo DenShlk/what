@@ -1,11 +1,27 @@
-package com.hypersphere.what;
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package com.hypersphere.what.helpers;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,7 +35,6 @@ import com.hypersphere.what.model.CommentEntry;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.model.UserEntry;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +42,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Class for working with Firebase (or other CloudStorage)
+ * Class for working with Firebase Authentication, Realtime Database, Storage.
  */
 
-public class CloudManager {
+public class CloudHelper {
 
 	private static DatabaseReference projectsRef, usersRef, commentsRef, projectsDoneNotificationRef, projectsDoneRef;
 
@@ -42,14 +57,26 @@ public class CloudManager {
 
 	private static OnDownloadListener<UserEntry> userDownloadListener;
 
-	private static final int MAX_IMAGE_SIZE = 1000 * 1000;
 	private static final Map<String, Bitmap> imageCash = new HashMap<>();
 
 	private static UserEntry curUser;
 	
 	private static final Gson gson = new Gson();
 
-	private static void start() {
+	/**
+	 * initialization
+	 */
+	static {
+		FirebaseDatabase database = FirebaseDatabase.getInstance();
+		projectsRef = database.getReference("projects");
+		usersRef = database.getReference("users");
+		commentsRef = database.getReference("comments");
+		projectsDoneRef = database.getReference("projects-done");
+		projectsDoneNotificationRef = database.getReference("projects-done-notifications");
+
+		StorageReference storage = FirebaseStorage.getInstance().getReference();
+		images = storage.child("images");
+
 		if(!userLoading && curUser==null && firebaseAuth.getCurrentUser()!=null) {
 			getUser(firebaseAuth.getCurrentUser().getUid(), new OnDownloadListener<UserEntry>() {
 				@Override
@@ -64,25 +91,32 @@ public class CloudManager {
 				public void onCancel() {}
 			});
 		}
-
-		FirebaseDatabase database = FirebaseDatabase.getInstance();
-		projectsRef = database.getReference("projects");
-		usersRef = database.getReference("users");
-		commentsRef = database.getReference("comments");
-		projectsDoneRef = database.getReference("projects-done");
-		projectsDoneNotificationRef = database.getReference("projects-done-notifications");
-
-		StorageReference storage = FirebaseStorage.getInstance().getReference();
-		images = storage.child("images");
 	}
 
-	public static void setUserDownloadListener(OnDownloadListener<UserEntry> userDownloadListener) {
-		CloudManager.userDownloadListener = userDownloadListener;
+	/**
+	 * if current user have loaded it directly call onComplete of listener, otherwise it will be
+	 * when user is loaded
+	 *
+	 * @param userDownloadListener
+	 */
+	public static void setCurrentUserDownloadListener(OnDownloadListener<UserEntry> userDownloadListener) {
+		if (userLoading)
+			CloudHelper.userDownloadListener = userDownloadListener;
+		else
+			userDownloadListener.onComplete(getCurUser());
 	}
 
-	public static void newProject(ProjectEntry project, List<Bitmap> images, final OnUploadListener listener) {
-		start();
+	/**
+	 * Loads project as new from current user to database
+	 *
+	 * @param project
+	 * @param images  images of project it will be sent to Storage and added to project.images as ID-string
+	 */
+	public static void newProject(ProjectEntry project, List<Bitmap> images) {
+		newProject(project, images, null);
+	}
 
+	public static void newProject(ProjectEntry project, List<Bitmap> images, @Nullable final OnUploadListener listener) {
 		project.images = new ArrayList<>();
 		for (Bitmap bmp : images) {
 			project.images.add(newImage(bmp, null));
@@ -93,11 +127,28 @@ public class CloudManager {
 		curUser.myProjects.add(newRef.getKey());
 		updateCurUser();
 
-		newRef.setValue(project.getJson()).addOnCompleteListener(task -> listener.onComplete());
+		String data = gson.toJson(project);
+		Task<Void> task = newRef.setValue(data);
+		if (listener != null)
+			task.addOnCompleteListener(task1 -> {
+				if (task1.isSuccessful())
+					listener.onComplete();
+				else
+					listener.onCancel();
+			});
+	}
+
+	/**
+	 * login as user with given email and password
+	 *
+	 * @param email
+	 * @param password
+	 */
+	public static void login(String email, String password){
+		login(email, password, null);
 	}
 
 	public static void login(String email, String password, final OnAuthListener listener) {
-		start();
 		firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
 			if (task.isSuccessful()) {
 				getUser(firebaseAuth.getCurrentUser().getUid(), new OnDownloadListener<UserEntry>() {
@@ -110,60 +161,86 @@ public class CloudManager {
 					public void onCancel() {
 					}
 				});
-
-				listener.onSuccess();
-			} else
+				if (listener != null)
+					listener.onSuccess();
+			} else if (listener != null)
 				listener.onError();
 		});
 	}
 
-	public static boolean isLoginNeed(){
-		start();
-
-		return firebaseAuth.getCurrentUser() == null;
+	/**
+	 * Creates new user with given username, email, password
+	 *
+	 * @param username
+	 * @param email
+	 * @param password
+	 */
+	public static void sign(final String username, final String email, final String password) {
+		sign(username, email, password, null);
 	}
 
-	public static void sign(final String username, final String email, String password, final OnAuthListener listener) {
-		start();
-
+	public static void sign(final String username, final String email, final String password, final OnAuthListener listener) {
 		firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
 			if (task.isSuccessful()) {
 				curUser = new UserEntry(username, email, new ArrayList<>(), firebaseAuth.getCurrentUser().getUid(), "default_avatar.png");
 				updateCurUser();
 
-				listener.onSuccess();
-			}else
+				if (listener != null)
+					listener.onSuccess();
+			} else if (listener != null)
 				listener.onError();
 		});
 	}
 
-	private static void updateCurUser(){
-		start();
+	/**
+	 * check if user already logged
+	 *
+	 * @return
+	 */
+	public static boolean isLoginNeed() {
+		return firebaseAuth.getCurrentUser() == null;
+	}
 
+	/**
+	 * Replaces current user database-value with current value
+	 */
+	private static void updateCurUser(){
 		String userData = gson.toJson(getCurUser(), UserEntry.class);
 		usersRef.child(firebaseAuth.getCurrentUser().getUid()).setValue(userData);
 	}
 
-	public static String newImage(Bitmap image, final OnUploadListener listener) {
-		start();
+	/**
+	 * Creates id for new image and load it to images reference
+	 *
+	 * @param image
+	 * @return id of image that can be used to download image
+	 */
+	public static String newImage(Bitmap image) {
+		return newImage(image, null);
+	}
 
-		String imName = String.valueOf(UUID.randomUUID());
-		images.child(imName).putBytes(bitmapToCompressedData(image)).addOnCompleteListener(task -> {
+	public static String newImage(Bitmap image, @Nullable final OnUploadListener listener) {
+		String imageName = String.valueOf(UUID.randomUUID());
+		images.child(imageName).putBytes(MediaHelper.bitmapToCompressedData(image)).addOnCompleteListener(task -> {
 			if (listener != null)
 				if (task.isSuccessful())
 					listener.onComplete();
 				else {
 					task.getException().printStackTrace();
+
 					listener.onCancel();
 				}
 		});
 
-		return imName;
+		return imageName;
 	}
 
-	public static void loadImage(final String src, final OnDownloadListener<Bitmap> listener) {
-		start();
-
+	/**
+	 * Load image by src
+	 * @param src id of image
+	 * @param listener
+	 */
+	public static void loadImage(final String src, @NonNull final OnDownloadListener<Bitmap> listener) {
 		if(imageCash.containsKey(src)){
 			listener.onComplete(imageCash.get(src));
 		}else {
@@ -180,15 +257,19 @@ public class CloudManager {
 		}
 	}
 
-	public static void getUser(String uid, final OnDownloadListener<UserEntry> listener) {
+	/**
+	 * Get user with given uid
+	 * @param uid
+	 * @param listener
+	 */
+	public static void getUser(String uid, @NonNull final OnDownloadListener<UserEntry> listener) {
 		userLoading = true;
-		start();
 
 		usersRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				userLoading = false;
-				
+
 				listener.onComplete(gson.fromJson(dataSnapshot.getValue(String.class), UserEntry.class));
 			}
 
@@ -196,28 +277,15 @@ public class CloudManager {
 			public void onCancelled(@NonNull DatabaseError databaseError) {
 				userLoading = false;
 				databaseError.toException().printStackTrace();
-				listener.onCancel();
 			}
 		});
 	}
 
-	private static byte[] bitmapToCompressedData(Bitmap bmp) {
-
-		int size = bmp.getWidth() * bmp.getHeight();
-		if (size > MAX_IMAGE_SIZE) {
-			double k = Math.sqrt(1.0 * size / MAX_IMAGE_SIZE);
-			bmp = Bitmap.createScaledBitmap(bmp, (int) (bmp.getWidth() / k), (int) (bmp.getHeight() / k), false);
-		}
-
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-		return stream.toByteArray();
-	}
-
-	public static void loadProjects(final OnDownloadListener<List<ProjectEntry>> listener) {
-		start();
-
+	/**
+	 * Load created projects from database
+	 * @param listener
+	 */
+	public static void loadProjects(@NonNull final OnDownloadListener<List<ProjectEntry>> listener) {
 		projectsRef.addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -236,9 +304,11 @@ public class CloudManager {
 		});
 	}
 
-	public static void loadProjectsDone(final OnDownloadListener<List<ProjectEntry>> listener) {
-		start();
-
+	/**
+	 * Load done projects from database reference
+	 * @param listener
+	 */
+	public static void loadDoneProjects(@NonNull final OnDownloadListener<List<ProjectEntry>> listener) {
 		projectsDoneRef.child(curUser.id).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -257,9 +327,12 @@ public class CloudManager {
 		});
 	}
 
-	public static void loadProject(String projectId, OnDownloadListener<ProjectEntry> listener){
-		start();
-
+	/**
+	 * Load project by given id
+	 * @param projectId
+	 * @param listener
+	 */
+	public static void loadProject(String projectId, @NonNull OnDownloadListener<ProjectEntry> listener){
 		projectsRef.child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -274,9 +347,12 @@ public class CloudManager {
 		});
 	}
 
-	public static void loadProjectDone(String projectId, OnDownloadListener<ProjectEntry> listener){
-		start();
-
+	/**
+	 * Load done project by given id
+	 * @param projectId
+	 * @param listener
+	 */
+	public static void loadProjectDone(String projectId, @NonNull OnDownloadListener<ProjectEntry> listener){
 		projectsDoneRef.child(curUser.id).child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -291,29 +367,37 @@ public class CloudManager {
 		});
 	}
 
+	/**
+	 * @return current user
+	 */
 	public static UserEntry getCurUser() {
-		start();
-
 		return curUser;
 	}
 
+	/**
+	 * Update project donationsCollected field and check if it reached donationsGoal calls
+	 * finishProject
+	 * @param project
+	 * @param payAmount
+	 * @return
+	 */
 	public static ProjectEntry notifyDonation(ProjectEntry project, double payAmount) {
-		start();
-
 		project.donationsCollected += payAmount;
-		
+
 		projectsRef.child(project.id).setValue(gson.toJson(project));
 
-		if (project.donationsCollected - 0.01 >= project.donationsGoal){
+		if (project.donationsCollected - 0.01 >= project.donationsGoal) {
 			finishProject(project);
 		}
 
 		return project;
 	}
 
+	/**
+	 * Moves project from projects to projectsDone
+	 * @param project
+	 */
 	public static void finishProject(ProjectEntry project){
-		start();
-
 		getUser(project.creatorId, new OnDownloadListener<UserEntry>() {
 			@Override
 			public void onComplete(UserEntry data) {
@@ -329,21 +413,36 @@ public class CloudManager {
 		});
 	}
 
+	/**
+	 * Send given comment to database
+	 * @param comment
+	 */
 	public static void newComment(CommentEntry comment) {
-		start();
-		
 		String data = gson.toJson(comment);
 		commentsRef.child(comment.projectId).push().setValue(data);
 	}
 
-	public static void loadComments(String projectId, OnDownloadListener<List<CommentEntry>> listener){
-		start();
+	/**
+	 * Change image-src of current user to given
+	 *
+	 * @param image
+	 */
+	public static void setUserImage(@NonNull Bitmap image) {
+		curUser.image = newImage(image);
+		updateCurUser();
+	}
 
+	/**
+	 * Load comments by given projectId
+	 * @param projectId
+	 * @param listener
+	 */
+	public static void loadComments(String projectId, @NonNull OnDownloadListener<List<CommentEntry>> listener){
 		commentsRef.child(projectId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				List<CommentEntry> list = new ArrayList<>();
-				
+
 				for(DataSnapshot commentData : dataSnapshot.getChildren()){
 					list.add(gson.fromJson(commentData.getValue(String.class), CommentEntry.class));
 				}
@@ -358,9 +457,11 @@ public class CloudManager {
 		});
 	}
 
-	public static void listenProjectDone(OnProjectDoneListener listener){
-		start();
-
+	/**
+	 * Add listener to done projects database reference
+	 * @param listener
+	 */
+	public static void listenDoneProjects(OnProjectDoneListener listener){
 		projectsDoneNotificationRef.child(curUser.id).addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -380,22 +481,35 @@ public class CloudManager {
 		});
 	}
 
+	/**
+	 * Listen project done event
+	 */
 	public interface OnProjectDoneListener {
 		void onProjectDone(String projectId);
 	}
 
+	/**
+	 * Listen authentication events
+	 */
 	public interface OnAuthListener {
 		void onSuccess();
 
 		void onError();
 	}
 
+	/**
+	 * Listen download from database events
+	 * @param <T> type of object
+	 */
 	public interface OnDownloadListener<T> {
 		void onComplete(T data);
 
 		void onCancel();
 	}
 
+	/**
+	 * Listen upload to database events
+	 */
 	public interface OnUploadListener {
 		void onComplete();
 

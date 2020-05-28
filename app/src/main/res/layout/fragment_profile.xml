@@ -1,9 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2020 Denis Shulakov
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License
+  ~ is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+  ~ or implied. See the License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:clickable="true">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
@@ -28,6 +42,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:autoSizeTextType="uniform"
+        android:text="example_user"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@+id/guideline4"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,10 +52,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:background="@color/backgroundColor"
         android:elevation="0dp"
         android:orientation="vertical"
+        android:layout_marginTop="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,6 +79,7 @@
             android:id="@+id/profile_active_recycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="20dp"
             android:paddingHorizontal="2dp"
             app:layout_constraintTop_toBottomOf="@+id/profile_my_active_projects_text" />
 
@@ -105,7 +122,7 @@
             android:id="@+id/user_image_view"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:scaleType="fitCenter"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_account_circle_gray_24dp"/>
     </com.google.android.material.card.MaterialCardView>
 
@@ -117,8 +134,9 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:autoSizeTextType="uniform"
+        android:text="example@mail.fail"
         android:maxLines="1"
-        android:paddingTop="10dp"
+        android:paddingTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/materialCardView3"
         app:layout_constraintTop_toBottomOf="@+id/profile_nick_text" />

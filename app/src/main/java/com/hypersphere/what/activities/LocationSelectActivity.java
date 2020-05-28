@@ -1,9 +1,22 @@
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.hypersphere.what.activities;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -14,9 +27,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,21 +40,28 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.KeyboardHelper;
 import com.hypersphere.what.views.TouchableWrapper;
 
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Calls in {@link com.hypersphere.what.fragments.CreateProjectFragment}
+ * User can move map to place marker in center of screen to needed location.
+ * Uses {@link TouchableWrapper} to detect the completion of map moves.
+ */
 public class LocationSelectActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-	private static final int LOCATION_REQUEST = 473;
+	private static final int LOCATION_REQUEST = 641;
 	private static final String[] LOCATION_PERMS = {
 			Manifest.permission.ACCESS_FINE_LOCATION
 	};
 
 	private GoogleMap googleMap;
-	private double myLatitude;
-	private double myLongitude;
+
+	//Saint-Petersburg
+	private LatLng defaultLocation = new LatLng(59.940805, 30.344595);
 
 	private LocationManager locationManager;
 
@@ -84,10 +102,7 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 					googleMap.animateCamera(CameraUpdateFactory.newLatLng(loc));
 					addressInput.clearFocus();
 
-					//hide keyboard
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(addressInput.getWindowToken(),
-							InputMethodManager.HIDE_NOT_ALWAYS);
+					KeyboardHelper.hideKeyboard(addressInput);
 				}
 			}
 		});
@@ -102,6 +117,7 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 			return false;
 		});
 
+		//Send ok result
 		findViewById(R.id.accept_button).setOnClickListener(v -> {
 			Intent data = new Intent();
 			data.putExtra("lat", googleMap.getCameraPosition().target.latitude);
@@ -112,12 +128,16 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		});
 	}
 
+	/**
+	 * Sets onClicks to map-controls
+	 * Runnable used to define loops action if button pressed
+	 */
 	private void setUpButtons(){
 		findViewById(R.id.my_position_button).setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition())));
 
 		final Handler handler = new Handler();
 
-		final View zoomInButton = findViewById(R.id.zoom_in_button);
+		View zoomInButton = findViewById(R.id.zoom_in_button);
 		zoomInButton.setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.zoomIn()));
 		final Runnable zoomInAction = new Runnable() {
 			@Override
@@ -134,7 +154,6 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				handler.removeCallbacks(zoomInAction);
 				v.performClick();
-				//return true;
 			}
 			return false;
 		});
@@ -156,12 +175,16 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				handler.removeCallbacks(zoomOutAction);
 				v.performClick();
-				//return true;
 			}
 			return false;
 		});
 	}
 
+	/**
+	 * Convert given String address to LatLng point
+	 * @param strAddress String address
+	 * @return LatLng point matches given address
+	 */
 	private LatLng getLocationFromAddress(String strAddress) {
 
 		Geocoder geocoder = new Geocoder(this);
@@ -187,6 +210,11 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		}
 	}
 
+	/**
+	 * Convert LatLng point to String address
+	 * @param location LatLng point
+	 * @return String address matches given point
+	 */
 	private String getAddressFromLocation(LatLng location) {
 
 		Geocoder geocoder = new Geocoder(this);
@@ -213,6 +241,9 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		}
 	}
 
+	/**
+	 * Starts map setup - load map (async) and request permission to get current location
+	 */
 	private void preSetUpMap() {
 		SupportMapFragment googleMapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
 		googleMapFragment.getMapAsync(this);
@@ -223,27 +254,24 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 
 	}
 
+	/**
+	 * Calls setUpMap without checking results.
+	 * If permission granted it will move camera to current location.
+	 * Otherwise camera will be moved to default location.
+	 * @param requestCode
+	 * @param permissions
+	 * @param grantResults
+	 */
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		if (requestCode == LOCATION_REQUEST) {
-			if (!hasGPSPermission()) {
-				Toast.makeText(LocationSelectActivity.this, "All right, then. Keep your secrets.", Toast.LENGTH_LONG).show();
-				setUpMap();
-			} else {
-				setUpMap();
-
-			}
+			setUpMap();
 		}
 	}
 
 	/**
-	 * Manipulates the map once available.
-	 * This callback is triggered when the map is ready to be used.
-	 * This is where we can add markers or lines, add listeners or move the camera. In this case,
-	 * we just add a marker near Sydney, Australia.
-	 * If Google Play services is not installed on the device, the user will be prompted to install
-	 * it inside the SupportMapFragment. This method will only be triggered once the user has
-	 * installed Google Play services and returned to the app.
+	 * Calls setUpMap when map data loaded.
+	 * @param googleMap
 	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
@@ -252,6 +280,12 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		setUpMap();
 	}
 
+	/**
+	 * Sets map style, ui settings and moves camera to last address or, if it first to current
+	 * location (if permission granted).
+	 * Also set listener to wrapper that update text presentation of current address when each move
+	 * ended.
+	 */
 	private void setUpMap() {
 		if (googleMap == null)
 			return;
@@ -259,8 +293,6 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		googleMap.setMapStyle(
 				MapStyleOptions.loadRawResourceStyle(
 						LocationSelectActivity.this, R.raw.google_map_style));
-
-
 		googleMap.setMaxZoomPreference(20);
 
 		if (hasGPSPermission())
@@ -272,8 +304,6 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 		googleMap.getUiSettings().setAllGesturesEnabled(true);
 		googleMap.getUiSettings().setZoomControlsEnabled(false);
 		googleMap.getUiSettings().setMapToolbarEnabled(false);
-
-
 		wrapper.setListener(() -> {
 
 			final LatLng pos = googleMap.getCameraPosition().target;
@@ -295,22 +325,31 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 			double longitude = getIntent().getDoubleExtra("lon", 0);
 			googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17));
 		} else {
-			if (hasGPSPermission())
+			if (hasGPSPermission()) {
 				googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getMyPosition(), 17));
+			} else {
+				googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 9));
+			}
 		}
 	}
 
+	/**
+	 * Returns current position by GPS.
+	 */
 	private LatLng getMyPosition() {
-		if (!hasGPSPermission())
-			return null;
+		if (!hasGPSPermission()) return null;
 
 		String locationProvider = LocationManager.GPS_PROVIDER;
+		//permission checked above
 		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-		myLatitude = lastKnownLocation.getLatitude();
-		myLongitude = lastKnownLocation.getLongitude();
+		double myLatitude = lastKnownLocation.getLatitude();
+		double myLongitude = lastKnownLocation.getLongitude();
 		return new LatLng(myLatitude, myLongitude);
 	}
 
+	/**
+	 * Checks if location permission granted.
+	 */
 	private boolean hasGPSPermission() {
 		return (PackageManager.PERMISSION_GRANTED == checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 	}

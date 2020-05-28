@@ -1,15 +1,26 @@
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.hypersphere.what.fragments;
 
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,13 +32,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
-import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.CloudHelper;
+import com.hypersphere.what.helpers.KeyboardHelper;
 import com.hypersphere.what.model.CommentEntry;
 import com.hypersphere.what.model.ProjectEntry;
 import com.hypersphere.what.views.AnimatedProgressBar;
-import com.hypersphere.what.views.CommentAdapter;
-import com.hypersphere.what.views.GalleryRecyclerAdapter;
+import com.hypersphere.what.views.adapters.CommentAdapter;
+import com.hypersphere.what.views.adapters.GalleryRecyclerAdapter;
 import com.yandex.money.api.methods.payment.params.P2pTransferParams;
 
 import java.math.BigDecimal;
@@ -35,7 +47,10 @@ import java.util.List;
 
 import ru.yandex.money.android.PaymentActivity;
 
-
+/**
+ * Shows information about project, and implements payment functional.
+ * On donation button click it starts {@link PaymentActivity}
+ */
 public class ProjectInfoFragment extends Fragment {
 
 	View mView;
@@ -49,7 +64,7 @@ public class ProjectInfoFragment extends Fragment {
 
 	private static final String CLIENT_ID = "6BC6EB098D661CCA8771C67A3141A63588E3D6CD7E8457A9815E891B7D3CDF8F";
 	private static final String HOST = "https://money.yandex.ru";
-	private static final int REQUEST_CODE_YANDEX_PAYMENT = 1;
+	private static final int REQUEST_CODE_YANDEX_PAYMENT = 4134;
 
 	private double payAmount = 0;
 	private ProjectEntry mProject;
@@ -57,7 +72,6 @@ public class ProjectInfoFragment extends Fragment {
 	public ProjectInfoFragment() {
 		// Required empty public constructor
 	}
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,7 +86,7 @@ public class ProjectInfoFragment extends Fragment {
 
 		infoGallery.setHasFixedSize(true);
 		infoGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-		infoGalleryAdapter = new GalleryRecyclerAdapter(getActivity());
+		infoGalleryAdapter = new GalleryRecyclerAdapter();
 		infoGallery.setAdapter(infoGalleryAdapter);
 
 		progressBar = mView.findViewById(R.id.info_progress_bar);
@@ -93,44 +107,36 @@ public class ProjectInfoFragment extends Fragment {
 		TextInputEditText commentText = mView.findViewById(R.id.info_add_comment_input);
 
 		View commentInputLayout = mView.findViewById(R.id.info_add_comment_layout);
-		
+
 		View addCommentButton = mView.findViewById(R.id.info_add_comment_button);
 		addCommentButton.setOnClickListener(v -> {
 
 			commentInputLayout.setVisibility(View.VISIBLE);
 			commentText.requestFocus();
 
-			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.showSoftInput(commentText, InputMethodManager.SHOW_IMPLICIT);
+			KeyboardHelper.openKeyboard(commentText);
 		});
 		View sendCommentButton = mView.findViewById(R.id.info_send_comment_button);
 		sendCommentButton.setOnClickListener(v -> {
-			CommentEntry comment = new CommentEntry(CloudManager.getCurUser().id, mProject.id, commentText.getText().toString());
+			CommentEntry comment = new CommentEntry(CloudHelper.getCurUser().id, mProject.id, commentText.getText().toString());
 
-			CloudManager.newComment(comment);
+			CloudHelper.newComment(comment);
 			commentAdapter.addComment(comment);
 
 			commentInputLayout.setVisibility(View.GONE);
 			commentText.setText("");
 			commentText.clearFocus();
-			//hide keyboard
-			InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(mView.getWindowToken(),
-					InputMethodManager.HIDE_NOT_ALWAYS);
+
+			KeyboardHelper.hideKeyboard(mView);
 		});
 
-		/*
-		getActivity().getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE |
-						WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE );
-		 */
-
 		ImageView userImage = mView.findViewById(R.id.info_user_image);
-		CloudManager.loadImage(CloudManager.getCurUser().image, new CloudManager.OnDownloadListener<Bitmap>() {
+		CloudHelper.loadImage(CloudHelper.getCurUser().image, new CloudHelper.OnDownloadListener<Bitmap>() {
 			@Override
 			public void onComplete(Bitmap data) {
 				userImage.setImageBitmap(data);
 			}
+
 			@Override
 			public void onCancel() {}
 		});
@@ -145,15 +151,16 @@ public class ProjectInfoFragment extends Fragment {
 		infoDescription.setText(project.description);
 		infoMoney.setText(ProjectEntry.getProgressString(project.donationsCollected, project.donationsGoal));
 
-		progressBar.setMax(project.donationsGoal);
+		progressBar.setMaxProgress(project.donationsGoal);
 		progressBar.setProgress(project.donationsCollected);
 
 		commentAdapter.clearComments();
-		CloudManager.loadComments(project.id, new CloudManager.OnDownloadListener<List<CommentEntry>>() {
+		CloudHelper.loadComments(project.id, new CloudHelper.OnDownloadListener<List<CommentEntry>>() {
 			@Override
 			public void onComplete(List<CommentEntry> data) {
 				commentAdapter.setComments(data);
 			}
+
 			@Override
 			public void onCancel() {}
 		});
@@ -161,8 +168,9 @@ public class ProjectInfoFragment extends Fragment {
 		infoGalleryAdapter.clear();
 		for (int i = 0; i < project.images.size(); i++) {
 			int finalI = i;
-			CloudManager.loadImage(project.images.get(i), new CloudManager.OnDownloadListener<Bitmap>() {
+			CloudHelper.loadImage(project.images.get(i), new CloudHelper.OnDownloadListener<Bitmap>() {
 				final int curI = finalI;
+
 				@Override
 				public void onComplete(Bitmap data) {
 					infoGalleryAdapter.addImage(data, curI);
@@ -188,7 +196,7 @@ public class ProjectInfoFragment extends Fragment {
 							return;
 						}
 
-
+						//save pay amount to notify CloudHelper if payment is successful
 						payAmount = Double.parseDouble(input.getText().toString());
 
 						Intent intent = PaymentActivity.getBuilder(getContext())
@@ -207,13 +215,20 @@ public class ProjectInfoFragment extends Fragment {
 
 	}
 
+	/**
+	 * Notifies {@link CloudHelper} and updates ui if payment was successful.
+	 *
+	 * @param requestCode
+	 * @param resultCode
+	 * @param data
+	 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if(requestCode == REQUEST_CODE_YANDEX_PAYMENT){
 			if(resultCode == Activity.RESULT_OK) {
-				mProject = CloudManager.notifyDonation(mProject, payAmount);
+				CloudHelper.notifyDonation(mProject, payAmount);
 				fillInfo(mProject);
 			}else
 				payAmount = 0;
@@ -224,8 +239,10 @@ public class ProjectInfoFragment extends Fragment {
 		closeListener = listener;
 	}
 
+	/**
+	 * Interface to notify context where this fragment was created.
+	 */
 	public interface CloseListener {
 		void onClose();
 	}
-
 }

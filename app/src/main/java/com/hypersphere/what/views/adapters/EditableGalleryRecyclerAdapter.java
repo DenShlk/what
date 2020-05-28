@@ -1,12 +1,24 @@
-package com.hypersphere.what.views;
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package com.hypersphere.what.views.adapters;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +30,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.hypersphere.what.OnResultCallbackActivity;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.MediaHelper;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Presents gallery with add/change image functional.
+ */
 public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<EditableGalleryRecyclerAdapter.ImageViewHolder> {
 
 	private final List<Bitmap> images;
@@ -52,6 +67,11 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 		return new ImageViewHolder(layoutView);
 	}
 
+	/**
+	 * Add image as last element of list.
+	 *
+	 * @param image
+	 */
 	public void addImage(Bitmap image){
 		for (int i = 0; i < images.size() - 1; i++) {
 			if(images.get(i)==null){
@@ -67,6 +87,10 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 		notifyItemRangeInserted(images.size() - 1, 1);
 	}
 
+	/**
+	 * Returns bitmaps that contains in gallery now.
+	 * @return
+	 */
 	public List<Bitmap> getImages(){
 		List<Bitmap> res = new ArrayList<>();
 		for(Bitmap bmp : images)
@@ -75,11 +99,20 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 		return res;
 	}
 
+	/**
+	 * Replaces image at given position.
+	 * @param image
+	 * @param position
+	 */
 	public void replaceImage(Bitmap image, int position){
 		images.set(position, image);
 		notifyItemChanged(position);
 	}
 
+	/**
+	 * Removes image at current position.
+	 * @param position
+	 */
 	public void deleteImage(int position){
 		images.remove(position);
 		notifyItemRemoved(position);
@@ -98,13 +131,14 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 		return images.size();
 	}
 
-	public class ImageViewHolder extends RecyclerView.ViewHolder{
-		private static final int REQUEST_NEW_IMAGE_CAPTURE = 1;
-		private static final int REQUEST_NEW_IMAGE_FROM_GALLERY = 2;
-		private static final int REQUEST_IMAGE_RECAPTURE = 3;
-		private static final int REQUEST_REOPEN_IMAGE_FROM_GALLERY = 4;
-
-
+	/**
+	 * Holder of image item. Opens bottom dialog with add or replace image functional.
+	 */
+	public class ImageViewHolder extends RecyclerView.ViewHolder implements OnResultCallbackActivity.ActivityResultListener {
+		private static final int REQUEST_NEW_IMAGE_CAPTURE = 342;
+		private static final int REQUEST_NEW_IMAGE_FROM_GALLERY = 3543;
+		private static final int REQUEST_IMAGE_RECAPTURE = 5451;
+		private static final int REQUEST_REOPEN_IMAGE_FROM_GALLERY = 3143;
 		private Bitmap image;
 		private final ImageView imageView;
 		private final ImageView addButton;
@@ -119,6 +153,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 			addButton.setOnClickListener(v -> {
 				final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
+				mBottomSheetDialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
 				View sheetView = activity.getLayoutInflater().inflate(R.layout.add_image_dialog_layout, null);
 				mBottomSheetDialog.setContentView(sheetView);
 				mBottomSheetDialog.show();
@@ -127,7 +162,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 				takeButton.setOnClickListener(v17 -> {
 					Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 					activity.startActivityForResult(cameraIntent, REQUEST_NEW_IMAGE_CAPTURE);
-					activity.setWaitForCallback(ImageViewHolder.this);
+					activity.addActivityResultListener(ImageViewHolder.this);
 
 					mBottomSheetDialog.cancel();
 				});
@@ -138,7 +173,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 					galleryIntent.setType("image/*");
 					galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 					activity.startActivityForResult(galleryIntent, REQUEST_NEW_IMAGE_FROM_GALLERY);
-					activity.setWaitForCallback(ImageViewHolder.this);
+					activity.addActivityResultListener(ImageViewHolder.this);
 
 					mBottomSheetDialog.cancel();
 				});
@@ -147,6 +182,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 			imageView.setOnClickListener(v -> {
 				final BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(activity);
+				mBottomSheetDialog.getBehavior().setState(BottomSheetBehavior.STATE_EXPANDED);
 				View sheetView = activity.getLayoutInflater().inflate(R.layout.redact_image_dialog_layout, null);
 				mBottomSheetDialog.setContentView(sheetView);
 				mBottomSheetDialog.show();
@@ -162,8 +198,6 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 					View backButton = showDialog.findViewById(R.id.back_button);
 					backButton.setOnClickListener(v14 -> showDialog.dismiss());
 					showDialog.show();
-
-
 					mBottomSheetDialog.cancel();
 				});
 
@@ -172,7 +206,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 					Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 					activity.startActivityForResult(cameraIntent, REQUEST_IMAGE_RECAPTURE);
-					activity.setWaitForCallback(ImageViewHolder.this);
+					activity.addActivityResultListener(ImageViewHolder.this);
 
 					mBottomSheetDialog.cancel();
 				});
@@ -184,7 +218,7 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 					galleryIntent.setType("image/*");
 					galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 					activity.startActivityForResult(galleryIntent, REQUEST_REOPEN_IMAGE_FROM_GALLERY);
-					activity.setWaitForCallback(ImageViewHolder.this);
+					activity.addActivityResultListener(ImageViewHolder.this);
 
 					mBottomSheetDialog.cancel();
 				});
@@ -199,6 +233,10 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 
 		}
 
+		/**
+		 * Hides add image button and shows ImageView with given image.
+		 * @param image if null returns Holder to initial state.
+		 */
 		public void setImage(Bitmap image) {
 			this.image = image;
 			if(image == null){
@@ -210,64 +248,54 @@ public class EditableGalleryRecyclerAdapter extends RecyclerView.Adapter<Editabl
 			}
 			imageView.setImageBitmap(image);
 		}
-		
-		public void onResult(int requestCode, int resultCode, @Nullable Intent data){
-			if(requestCode == REQUEST_NEW_IMAGE_CAPTURE) {
-				activity.setWaitForCallback(null);
+
+		/**
+		 * Listens result of bottom dialog.
+		 *
+		 * @param requestCode
+		 * @param resultCode
+		 * @param data
+		 */
+		public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+			if (requestCode == REQUEST_NEW_IMAGE_CAPTURE) {
+				activity.removeActivityResultListener(ImageViewHolder.this);
 
 				if (resultCode == Activity.RESULT_OK) {
 					Bitmap photo = (Bitmap) data.getExtras().get("data");
 					addImage(photo);
 				}
 			}
-			if(requestCode == REQUEST_NEW_IMAGE_FROM_GALLERY) {
-				activity.setWaitForCallback(null);
+			if (requestCode == REQUEST_NEW_IMAGE_FROM_GALLERY) {
+				activity.removeActivityResultListener(ImageViewHolder.this);
 
 				if (resultCode == Activity.RESULT_OK) {
 					Uri photoUri = data.getData();
-					Bitmap photo = getImageByUri(photoUri);
+					Bitmap photo = MediaHelper.getImageByUri(photoUri);
 					if(photo != null)
 						addImage(photo);
 				}
 			}
 
-			if(requestCode == REQUEST_IMAGE_RECAPTURE) {
-				activity.setWaitForCallback(null);
+			if (requestCode == REQUEST_IMAGE_RECAPTURE) {
+				activity.removeActivityResultListener(ImageViewHolder.this);
 
 				if (resultCode == Activity.RESULT_OK) {
 					Bitmap photo = (Bitmap) data.getExtras().get("data");
 					replaceImage(photo, getAdapterPosition());
 				}
 			}
-			if(requestCode == REQUEST_REOPEN_IMAGE_FROM_GALLERY) {
-				activity.setWaitForCallback(null);
+			if (requestCode == REQUEST_REOPEN_IMAGE_FROM_GALLERY) {
+				activity.removeActivityResultListener(ImageViewHolder.this);
 
 				if (resultCode == Activity.RESULT_OK) {
 					Uri photoUri = data.getData();
-					Bitmap photo = getImageByUri(photoUri);
+					Bitmap photo = MediaHelper.getImageByUri(photoUri);
 					if(photo != null)
 						replaceImage(photo, getAdapterPosition());
 				}
 			}
 		}
-
-		private Bitmap getImageByUri(Uri uri){
-			try {
-				ParcelFileDescriptor parcelFileDescriptor =
-						activity.getContentResolver().openFileDescriptor(uri, "r");
-				FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-				Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-
-				parcelFileDescriptor.close();
-
-				return image;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return null;
-		}
 	}
-	
+
 }
 

@@ -1,5 +1,18 @@
-package com.hypersphere.what.fragments;
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 
+package com.hypersphere.what.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -38,27 +51,31 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.card.MaterialCardView;
-import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.CloudHelper;
 import com.hypersphere.what.model.ProjectEntry;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Fragment with map, navigation ui, and bottom sheet. Last one used
+ * to show {@link ProjectInfoFragment} on project marker click.
+ * Adds markers for each project with it's name and complete-level.
+ */
 public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, LocationListener {
 
 	private static final int LOCATION_REQUEST = 473;
 	private static final String[] LOCATION_PERMS = {
 			Manifest.permission.ACCESS_FINE_LOCATION
 	};
-	private boolean waitPermissionForMap = false;
 
 	private GoogleMap googleMap;
 	private View mView;
-	private double myLatitude;
-	private double myLongitude;
+
+	//Saint-Petersburg
+	private LatLng defaultLocation = new LatLng(59.940805, 30.344595);
 
 	private MaterialCardView infoCard;
 	private boolean focusedOnMarker = false;
@@ -76,7 +93,6 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 	public GoogleMapFragment() {
 		//required
 	}
-
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -112,10 +128,10 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 			@Override
 			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-				FrameLayout.LayoutParams params = ((FrameLayout.LayoutParams)controlsLayout.getLayoutParams());
+				FrameLayout.LayoutParams params = ((FrameLayout.LayoutParams) controlsLayout.getLayoutParams());
+				// [hard math] Long experiments have shown that it is only true way to smooth move up
 				int margin = (int) (slideOffset * relativeLayout.getHeight() + (1 - slideOffset) * infoBehaviour.getPeekHeight());
-				//if(infoBehaviour.getState() == BottomSheetBehavior.STATE_COLLAPSED)
-				if(margin < 0)
+				if (margin < 0)
 					margin = 0;
 				params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, margin);
 				controlsLayout.setLayoutParams(params);
@@ -125,6 +141,9 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		return mView;
 	}
 
+	/**
+	 * Hides bottom sheet because after onPause() project info fragment is empty.
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -133,8 +152,17 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		infoCard.setVisibility(View.GONE);
 	}
 
-	private void setUpButtons(){
-		mView.findViewById(R.id.my_position_button).setOnClickListener(v -> googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition())));
+	/**
+	 * Sets up google map navigation ui.
+	 * Runnable used to loop zoom action if button stay pressed.
+	 */
+	private void setUpButtons() {
+		mView.findViewById(R.id.my_position_button).setOnClickListener(v -> {
+			if (hasGPSPermission())
+				googleMap.animateCamera(CameraUpdateFactory.newLatLng(getMyPosition()));
+			else
+				googleMap.animateCamera(CameraUpdateFactory.newLatLng(defaultLocation));
+		});
 
 		final Handler handler = new Handler();
 
@@ -181,6 +209,9 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		});
 	}
 
+	/**
+	 * Starts map loading and requests permission.
+	 */
 	private void preSetUpMap() {
 		SupportMapFragment googleMapFragment = ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map));
 		googleMapFragment.getMapAsync(this);
@@ -194,93 +225,84 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		if (requestCode == LOCATION_REQUEST) {
-			if (!hasGPSPermission()) {
-				// TODO: 15.05.2020
-				setUpMap();
-			} else {
-				if (waitPermissionForMap) {
-					waitPermissionForMap = false;
-					setUpMap();
-				}
-			}
+			setUpMap();
 		}
 	}
 
 	/**
-	 * Manipulates the map once available.
-	 * This callback is triggered when the map is ready to be used.
-	 * This is where we can add markers or lines, add listeners or move the camera. In this case,
-	 * we just add a marker near Sydney, Australia.
-	 * If Google Play services is not installed on the device, the user will be prompted to install
-	 * it inside the SupportMapFragment. This method will only be triggered once the user has
-	 * installed Google Play services and returned to the app.
+	 * Loads markers when map is ready. Sets camera move listeners.
 	 */
 	@Override
 	public void onMapReady(GoogleMap googleMap) {
 		this.googleMap = googleMap;
-		if (!hasGPSPermission())
-			waitPermissionForMap = true;
-		else
-			setUpMap();
 
-
-		CloudManager.loadProjects(new CloudManager.OnDownloadListener<List<ProjectEntry>>() {
+		setUpMap();
+		CloudHelper.loadProjects(new CloudHelper.OnDownloadListener<List<ProjectEntry>>() {
 			@Override
 			public void onComplete(List<ProjectEntry> data) {
 				projects = data;
-				for(ProjectEntry project : projects){
+				for (ProjectEntry project : projects) {
 					addProjectMarker(project);
 				}
 			}
 
 			@Override
-			public void onCancel() {}
+			public void onCancel() {
+			}
 		});
 
+		// show bottom sheet with clicked marker info
 		googleMap.setOnMarkerClickListener(marker -> {
 
 			final ProjectEntry project = markerProjectMap.get(marker);
 			infoFragment.fillInfo(project);
 
-			if(!focusedOnMarker)
+			if (!focusedOnMarker)
 				changeFocusedOnMarker();
 
 			return false;
 		});
 
+		//hide bottom sheet if camera moved or user click free map space
 		googleMap.setOnCameraMoveStartedListener(i -> {
-			if(i==1){// move from user
-				if(focusedOnMarker)
+			if (i == 1) {// move from user
+				if (focusedOnMarker)
 					changeFocusedOnMarker();
 			}
 		});
 		googleMap.setOnMapClickListener(latLng -> {
-			if(focusedOnMarker)
+			if (focusedOnMarker)
 				changeFocusedOnMarker();
 		});
 
 	}
 
-
-
-	private void changeFocusedOnMarker(){
+	/**
+	 * Focuses on marker or cancel it.
+	 */
+	private void changeFocusedOnMarker() {
 		focusedOnMarker = !focusedOnMarker;
 
-		if(focusedOnMarker) {
+		if (focusedOnMarker) {
+			//show bottom sheet
 			infoCard.setVisibility(View.VISIBLE);
-			if(infoBehaviour.getState()==BottomSheetBehavior.STATE_HIDDEN)
+
+			if (infoBehaviour.getState() == BottomSheetBehavior.STATE_HIDDEN){
 				infoBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
+			}
+
 			infoBehaviour.setHideable(false);
 			infoBehaviour.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-			//donateButton.setTranslationY(infoBehaviour.getExpandedOffset());
-			//bottomPanel.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
-		}else {
+
+		} else {
+			//move bottom sheet to minimal visibility position
 			infoBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
-			//infoCard.callOnClick();
-			//bottomPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 		}
 	}
 
+	/**
+	 * Sets google map ui and move camera to user location (if has permission) or to default location.
+	 */
 	private void setUpMap() {
 		if (googleMap == null)
 			return;
@@ -289,39 +311,50 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 				MapStyleOptions.loadRawResourceStyle(
 						getContext(), R.raw.google_map_style));
 
-
 		googleMap.setMaxZoomPreference(20);
 
-
 		googleMap.setIndoorEnabled(false);
-		googleMap.setMyLocationEnabled(true);
 		googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 		googleMap.setTrafficEnabled(false);
 		googleMap.getUiSettings().setAllGesturesEnabled(true);
 		googleMap.getUiSettings().setZoomControlsEnabled(false);
 		googleMap.getUiSettings().setMapToolbarEnabled(false);
 
-		if (hasGPSPermission())
+		if (hasGPSPermission()) {
 			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(getMyPosition(), 16));
-
-
+			googleMap.setMyLocationEnabled(true);
+		} else {
+			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 9));
+		}
 	}
 
+	/**
+	 * Returns current user position.
+	 * @return
+	 */
 	private LatLng getMyPosition() {
 		if (!hasGPSPermission())
 			return null;
 
 		String locationProvider = LocationManager.GPS_PROVIDER;
 		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-		myLatitude = lastKnownLocation.getLatitude();
-		myLongitude = lastKnownLocation.getLongitude();
+		double myLatitude = lastKnownLocation.getLatitude();
+		double myLongitude = lastKnownLocation.getLongitude();
 		return new LatLng(myLatitude, myLongitude);
 	}
 
+	/**
+	 * Checks if GPS permission granted.
+	 * @return
+	 */
 	private boolean hasGPSPermission() {
 		return (PackageManager.PERMISSION_GRANTED == getContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 	}
 
+	/**
+	 * Creates marker for given project and adds it on map.
+	 * @param project
+	 */
 	private void addProjectMarker(ProjectEntry project){
 		View markerView = ((LayoutInflater) getActivity()
 				.getSystemService(
@@ -346,13 +379,17 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 								markerView))));
 
 		markerProjectMap.put(marker, project);
-
 	}
 
+	/**
+	 * Draws marker of given project on bitmap.
+	 * @param view
+	 * @return bitmap shows given project
+	 */
 	private Bitmap createDrawableFromView(View view) {
 		DisplayMetrics displayMetrics = new DisplayMetrics();
-		getActivity().getWindowManager().getDefaultDisplay()
-				.getMetrics(displayMetrics);
+		getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
 		view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT));
 		view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
@@ -368,6 +405,10 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		return bitmap;
 	}
 
+	/**
+	 * Methods below implements {@link OnMapReadyCallback} and haven't realized yet.
+	 */
+
 	@Override
 	public void onLocationChanged(Location location) {
 
@@ -375,14 +416,17 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
+
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
+
 	}
 }
 

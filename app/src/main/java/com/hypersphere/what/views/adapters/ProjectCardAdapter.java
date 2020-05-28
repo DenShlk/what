@@ -1,4 +1,18 @@
-package com.hypersphere.what.views;
+/*
+ * Copyright 2020 Denis Shulakov
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package com.hypersphere.what.views.adapters;
 
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -11,13 +25,17 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hypersphere.what.CloudManager;
 import com.hypersphere.what.R;
+import com.hypersphere.what.helpers.CloudHelper;
 import com.hypersphere.what.model.ProjectEntry;
+import com.hypersphere.what.views.AnimatedProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Presents list of project cards.
+ */
 public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.ProjectCardHolder> {
 
 	private final List<ProjectEntry> projectList;
@@ -57,6 +75,9 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 		return projectList.size();
 	}
 
+	/**
+	 * Presents card of project.
+	 */
 	public class ProjectCardHolder extends RecyclerView.ViewHolder {
 
 		ProjectEntry project;
@@ -98,12 +119,12 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 			title.setText(project.title);
 			description.setText(project.description);
 
-			progressBar.setMax(project.donationsGoal);
+			progressBar.setMaxProgress(project.donationsGoal);
 			progressBar.setProgress(project.donationsCollected, true);
 
 			progressText.setText(ProjectEntry.getProgressString(project.donationsCollected, project.donationsGoal));
 
-			CloudManager.loadImage(project.images.get(0), new CloudManager.OnDownloadListener<Bitmap>() {
+			CloudHelper.loadImage(project.images.get(0), new CloudHelper.OnDownloadListener<Bitmap>() {
 				@Override
 				public void onComplete(Bitmap data) {
 					previewImage.setImageBitmap(data);
@@ -113,10 +134,11 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 				public void onCancel() {}
 			});
 		}
-
-
 	}
 
+	/**
+	 * Notifies context about click on card of project.
+	 */
 	public interface ProjectPreviewClickListener{
 		void projectPreviewClick(ProjectEntry project);
 	}
