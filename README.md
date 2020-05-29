@@ -1,2 +1,2 @@
 # what
-Soon.
+Android app for crowdfunding with targeting by geo-location.
