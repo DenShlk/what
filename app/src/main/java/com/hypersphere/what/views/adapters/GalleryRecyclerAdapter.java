@@ -26,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hypersphere.what.R;
-import com.hypersphere.what.WhatApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +72,8 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 	 * @param index
 	 */
 	public void addImage(@NonNull Bitmap image, int index){
+		if (index > images.size())
+			index = images.size();
 		images.add(index, image);
 		notifyItemRangeInserted(index, 1);
 	}
@@ -130,7 +131,7 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
 
 			imageView.setImageBitmap(null);
 			imageView.setOnClickListener(v -> {
-				final Dialog showDialog = new Dialog(WhatApplication.getContext(), android.R.style.Theme_Translucent);
+				final Dialog showDialog = new Dialog(imageView.getContext(), android.R.style.Theme_Translucent);
 				showDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				showDialog.setCancelable(true);
 				showDialog.setContentView(R.layout.image_viewer_layout);

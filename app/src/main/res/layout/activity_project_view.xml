@@ -12,18 +12,42 @@
   ~ the License.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:activity=".ui.ProjectViewActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:activity=".ui.ProjectViewActivity"
+    android:orientation="vertical">
+
+   <com.google.android.material.appbar.AppBarLayout
+       android:id="@+id/appBarLayout"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:elevation="0dp"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent">
+
+      <androidx.appcompat.widget.Toolbar
+          android:id="@+id/app_bar"
+          android:layout_width="match_parent"
+          android:layout_height="?attr/actionBarSize"
+          android:paddingStart="0dp"
+          android:paddingEnd="12dp"
+          app:contentInsetStart="0dp"
+          app:titleTextAppearance="@style/TextAppearance.What.Headline.CustomFont"
+          app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
+          app:title="@string/app_name" />
+
+   </com.google.android.material.appbar.AppBarLayout>
 
    <FrameLayout
        android:id="@+id/project_activity_frame_layout"
        android:layout_width="match_parent"
-       android:layout_height="wrap_content">
+       android:layout_height="match_parent">
 
 
    </FrameLayout>
 
-</ScrollView>
+</LinearLayout>

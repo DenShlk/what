@@ -119,7 +119,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:startIconDrawable="@drawable/ic_account_balance_wallet_black_24dp"
-                    app:counterMaxLength="16"
+                    app:counterMaxLength="15"
                     app:counterEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText

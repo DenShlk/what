@@ -15,10 +15,10 @@
 package com.hypersphere.what.activities;
 
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.widget.Toolbar;
 
 import com.hypersphere.what.R;
 import com.hypersphere.what.fragments.ProjectInfoFragment;
@@ -37,25 +37,21 @@ public class ProjectViewActivity extends AppCompatActivity {
 
 		ProjectInfoFragment projectFragment = new ProjectInfoFragment();
 
-		FragmentTransaction transaction =
-				getSupportFragmentManager()
-						.beginTransaction()
-						.replace(R.id.project_activity_frame_layout, projectFragment);
+
+		getSupportFragmentManager()
+				.beginTransaction()
+				.replace(R.id.project_activity_frame_layout, projectFragment)
+				.commit();
 
 		ProjectEntry project = (ProjectEntry) getIntent().getExtras().getSerializable("project");
 
-		projectFragment.fillInfo(project);
+		projectFragment.fillInfoOnCreate(project);
+		projectFragment.setCloseButtonVisibility(View.GONE);
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-
-	// actionbar home click
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home) {
+		Toolbar toolbar = findViewById(R.id.app_bar);
+		setSupportActionBar(toolbar);
+		toolbar.setNavigationOnClickListener(v -> {
 			onBackPressed();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		});
 	}
 }

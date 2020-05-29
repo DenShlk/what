@@ -17,4 +17,5 @@
 
     <dimen name="marker_normal">15dp</dimen>
     <dimen name="marker_focused">25dp</dimen>
+    <dimen name="marker_progress_drawable_height">40dp</dimen>
 </resources>

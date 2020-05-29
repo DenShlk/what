@@ -52,6 +52,6 @@ public class ProjectEntry implements Serializable {
 
 	public static String getProgressString(double value, double goal) {
 		DecimalFormat format = new DecimalFormat("#.##");
-		return "$" + format.format(value) + "/" + format.format(goal);
+		return format.format(value) + "/" + format.format(goal) + "\u20BD";
 	}
 }

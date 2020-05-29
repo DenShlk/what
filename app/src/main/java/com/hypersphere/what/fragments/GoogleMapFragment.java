@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -337,9 +336,20 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 			return null;
 
 		String locationProvider = LocationManager.GPS_PROVIDER;
-		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-		double myLatitude = lastKnownLocation.getLatitude();
-		double myLongitude = lastKnownLocation.getLongitude();
+		List<String> providers = locationManager.getProviders(true);
+		Location bestLocation = null;
+		for (String provider : providers) {
+			@SuppressLint("MissingPermission") Location l = locationManager.getLastKnownLocation(provider);
+			if (l == null) {
+				continue;
+			}
+			if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+				// Found best last known location: %s", l);
+				bestLocation = l;
+			}
+		}
+		double myLatitude = bestLocation.getLatitude();
+		double myLongitude = bestLocation.getLongitude();
 		return new LatLng(myLatitude, myLongitude);
 	}
 
@@ -364,8 +374,7 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback, L
 		View progressView = markerView.findViewById(R.id.marker_progress_image);
 
 		//max height of image
-		BitmapDrawable bd = (BitmapDrawable) this.getResources().getDrawable(R.drawable.ic_location_on_progress_40dp, getContext().getTheme());
-		float maxHeight = bd.getBitmap().getHeight();
+		float maxHeight = getResources().getDimension(R.dimen.marker_progress_drawable_height);
 		progressView.getLayoutParams().height = (int) (maxHeight * (1 - project.donationsCollected / project.donationsGoal));
 		progressView.requestLayout();
 

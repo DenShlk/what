@@ -53,7 +53,7 @@ public class CloudHelper {
 
 	private static final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-	private static boolean userLoading = false;
+	private static boolean currentUserLoading = false;
 
 	private static OnDownloadListener<UserEntry> userDownloadListener;
 
@@ -77,10 +77,12 @@ public class CloudHelper {
 		StorageReference storage = FirebaseStorage.getInstance().getReference();
 		images = storage.child("images");
 
-		if(!userLoading && curUser==null && firebaseAuth.getCurrentUser()!=null) {
+		if (!currentUserLoading && curUser == null && firebaseAuth.getCurrentUser() != null) {
+			currentUserLoading = true;
 			getUser(firebaseAuth.getCurrentUser().getUid(), new OnDownloadListener<UserEntry>() {
 				@Override
 				public void onComplete(UserEntry data) {
+					currentUserLoading = false;
 					curUser = data;
 					if(userDownloadListener != null)
 						userDownloadListener.onComplete(curUser);
@@ -100,7 +102,7 @@ public class CloudHelper {
 	 * @param userDownloadListener
 	 */
 	public static void setCurrentUserDownloadListener(OnDownloadListener<UserEntry> userDownloadListener) {
-		if (userLoading)
+		if (currentUserLoading)
 			CloudHelper.userDownloadListener = userDownloadListener;
 		else
 			userDownloadListener.onComplete(getCurUser());
@@ -263,19 +265,15 @@ public class CloudHelper {
 	 * @param listener
 	 */
 	public static void getUser(String uid, @NonNull final OnDownloadListener<UserEntry> listener) {
-		userLoading = true;
-
 		usersRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-				userLoading = false;
-
 				listener.onComplete(gson.fromJson(dataSnapshot.getValue(String.class), UserEntry.class));
 			}
 
 			@Override
 			public void onCancelled(@NonNull DatabaseError databaseError) {
-				userLoading = false;
+				currentUserLoading = false;
 				databaseError.toException().printStackTrace();
 			}
 		});

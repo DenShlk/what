@@ -61,6 +61,7 @@ public class ProjectInfoFragment extends Fragment {
 	private CloseListener closeListener;
 	private CommentAdapter commentAdapter;
 	private MaterialButton donateButton;
+	private View closeButton;
 
 	private static final String CLIENT_ID = "6BC6EB098D661CCA8771C67A3141A63588E3D6CD7E8457A9815E891B7D3CDF8F";
 	private static final String HOST = "https://money.yandex.ru";
@@ -68,6 +69,7 @@ public class ProjectInfoFragment extends Fragment {
 
 	private double payAmount = 0;
 	private ProjectEntry mProject;
+	private int closeButtonVisibility = View.VISIBLE;
 
 	public ProjectInfoFragment() {
 		// Required empty public constructor
@@ -91,7 +93,7 @@ public class ProjectInfoFragment extends Fragment {
 
 		progressBar = mView.findViewById(R.id.info_progress_bar);
 
-		View closeButton = mView.findViewById(R.id.info_close_button);
+		closeButton = mView.findViewById(R.id.info_close_button);
 		closeButton.setOnClickListener(v -> {
 			if(closeListener!=null)
 				closeListener.onClose();
@@ -141,9 +143,36 @@ public class ProjectInfoFragment extends Fragment {
 			public void onCancel() {}
 		});
 
+		if (mProject != null) fillInfo(mProject);
+
+		setCloseButtonVisibility(closeButtonVisibility);
+
 		return mView;
 	}
 
+	public void setCloseButtonVisibility(int visibility) {
+		if (closeButton == null) {
+			closeButtonVisibility = visibility;
+		} else {
+			closeButton.setVisibility(visibility);
+		}
+	}
+
+	/**
+	 * Sets mProject as given project. You should use it if you want fill project info directly
+	 * after fragment creating. You can't use fillInfo(), because fragment doesn't inflated still (probably).
+	 *
+	 * @param project
+	 */
+	public void fillInfoOnCreate(ProjectEntry project) {
+		mProject = project;
+	}
+
+	/**
+	 * Fills info from project data to fragment views.
+	 *
+	 * @param project
+	 */
 	public void fillInfo(final ProjectEntry project){
 		mProject = project;
 
@@ -198,7 +227,6 @@ public class ProjectInfoFragment extends Fragment {
 
 						//save pay amount to notify CloudHelper if payment is successful
 						payAmount = Double.parseDouble(input.getText().toString());
-
 						Intent intent = PaymentActivity.getBuilder(getContext())
 								.setPaymentParams(new P2pTransferParams.Builder(project.walletId)
 										.setAmount(new BigDecimal(payAmount))

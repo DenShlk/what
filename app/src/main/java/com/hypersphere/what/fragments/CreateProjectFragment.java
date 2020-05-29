@@ -33,6 +33,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.hypersphere.what.OnResultCallbackActivity;
 import com.hypersphere.what.R;
 import com.hypersphere.what.activities.LocationSelectActivity;
+import com.hypersphere.what.activities.MainActivity;
 import com.hypersphere.what.helpers.CloudHelper;
 import com.hypersphere.what.helpers.KeyboardHelper;
 import com.hypersphere.what.helpers.MediaHelper;
@@ -146,6 +147,11 @@ public class CreateProjectFragment extends Fragment {
 			loadingDialog.show();
 			*/
 			CloudHelper.newProject(project, galleryAdapter.getImages());
+
+			MainActivity activity = (MainActivity) getActivity();
+			activity.smoothNavigateTo(MainActivity.MainFragmentsEnum.Map);
+
+			clearFields();
 		});
 
 		//force to save state
@@ -170,6 +176,20 @@ public class CreateProjectFragment extends Fragment {
 		}
 
 		return mView;
+	}
+
+	/**
+	 * Clears oll input data.
+	 */
+	private void clearFields() {
+		locationInput.setText("");
+		titleInput.setText("");
+		descriptionInput.setText("");
+		moneyGoalInput.setText("");
+		moneyInvestInput.setText("");
+		moneyWalletInput.setText("");
+		latitude = 0;
+		longitude = 0;
 	}
 
 	/**
