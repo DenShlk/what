@@ -94,7 +94,8 @@ public class CreateProjectFragment extends Fragment {
 		moneyInvestInput = mView.findViewById(R.id.money_investment_edit_layout);
 		moneyWalletInput = mView.findViewById(R.id.money_wallet_edit_layout);
 		locationInput = mView.findViewById(R.id.location_edit_layout);
-		locationInput.setOnClickListener(v -> {
+		//locationInput is layout and layout don't call click listener
+		locationInput.getEditText().setOnClickListener(v -> {
 			if (locationRequested)
 				return;
 			locationRequested = true;
@@ -243,7 +244,7 @@ public class CreateProjectFragment extends Fragment {
 
 		//address don't entered
 		if (longitude == 0 || latitude == 0) {
-			locationInput.setError("Enter location");
+			locationInput.setError(getString(R.string.create_error_enter_location));
 			correct = false;
 		}
 

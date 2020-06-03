@@ -33,6 +33,10 @@
     <string name="login_login">Log In</string>
     <string name="login_have_account">Already have an account?</string>
     <string name="login_sign">Sign Up</string>
+    <!--login activity error text-->
+    <string name="login_error_email_invalid">Email invalid</string>
+    <string name="login_error_password_invalid">At least 6 characters</string>
+    <string name="login_error_username_empty">Enter username</string>
 
     <!--tutorial activity-->
     <string name="tutorial_skip">skip</string>
@@ -73,6 +77,7 @@
     <string name="create_error_goal_bigger_invest">Goal must be bigger than invest</string>
     <string name="create_error_invest_smaller_goal">Invest must be smaller than goal</string>
     <string name="create_error_15_digits">Number consists from 15 digits</string>
+    <string name="create_error_enter_location">Enter location</string>
 
     <!--profile fragment-->
     <string name="profile_my_active_projects">My active projects:</string>
@@ -103,6 +108,6 @@
     <string name="redact_image_delete_image">Delete image</string>
 
     <!--change avatar dialog in profile fragment-->
-    <string name="profile_dialog_change_avatar">Change avatar</string>>
+    <string name="profile_dialog_change_avatar">Change avatar</string>
 
 </resources>

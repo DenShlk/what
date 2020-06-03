@@ -157,16 +157,18 @@ public class CloudHelper {
 					@Override
 					public void onComplete(UserEntry data) {
 						curUser = data;
+						if (listener != null)
+							listener.onSuccess();
 					}
 
 					@Override
 					public void onCancel() {
+						if (listener != null) listener.onError();
 					}
 				});
-				if (listener != null)
-					listener.onSuccess();
-			} else if (listener != null)
+			} else if (listener != null) {
 				listener.onError();
+			}
 		});
 	}
 

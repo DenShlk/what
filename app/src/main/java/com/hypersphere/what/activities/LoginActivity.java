@@ -75,20 +75,50 @@ public class LoginActivity extends AppCompatActivity {
 
 		loginUserId.getEditText().setOnEditorActionListener((v, actionId, event) -> {
 			String email = v.getText().toString();
-			if (!checkEmail(email))
-				loginUserId.setError("Email invalid");
-			else
-				loginUserId.setError("");
+			if (!checkEmail(email)) {
+				loginUserId.setError(getString(R.string.login_error_email_invalid));
+			} else loginUserId.setError(null);
 			return false;
 		});
 		loginPassword.getEditText().setOnEditorActionListener((v, actionId, event) -> {
 			String password = v.getText().toString();
-			if (checkPassword(password))
-				loginUserId.setError("At least 6 characters");
-			else
-				loginUserId.setError("");
+			if (!checkPassword(password)) {
+				loginPassword.setError(getString(R.string.login_error_password_invalid));
+			} else loginPassword.setError(null);
 			return false;
 		});
+
+		signUsername.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			String username = v.getText().toString();
+			if (!checkUsername(username)) {
+				signUsername.setError(getString(R.string.login_error_username_empty));
+			} else signUsername.setError(null);
+			return false;
+		});
+		signEmail.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			String email = v.getText().toString();
+			if (!checkEmail(email)) {
+				signEmail.setError(getString(R.string.login_error_email_invalid));
+			} else signEmail.setError(null);
+			return false;
+		});
+		signPassword.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			String password = v.getText().toString();
+			if (!checkPassword(password)) {
+				signPassword.setError(getString(R.string.login_error_password_invalid));
+			} else signPassword.setError(null);
+			return false;
+		});
+	}
+
+	/**
+	 * Checks username correctness.
+	 *
+	 * @param username
+	 * @return
+	 */
+	private boolean checkUsername(String username) {
+		return !username.isEmpty();
 	}
 
 	/**
@@ -144,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
 		String username = signUsername.getEditText().getText().toString();
 		String email = signEmail.getEditText().getText().toString();
 		String password = signPassword.getEditText().getText().toString();
-		if (checkEmail(email) && checkPassword(password)) {
+		if (checkUsername(username) && checkEmail(email) && checkPassword(password)) {
 			CloudHelper.sign(username, email, password, new CloudHelper.OnAuthListener() {
 				@Override
 				public void onSuccess() {
@@ -168,7 +198,7 @@ public class LoginActivity extends AppCompatActivity {
 	 */
 	private void navigateToNext(boolean isNewUser) {
 		Intent intent;
-		if(isNewUser)
+		if (isNewUser)
 			intent = new Intent(LoginActivity.this, TutorialActivity.class);
 		else
 			intent = new Intent(LoginActivity.this, MainActivity.class);

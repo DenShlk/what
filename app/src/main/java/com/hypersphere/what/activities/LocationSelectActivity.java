@@ -21,7 +21,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -286,6 +288,7 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 	 * Also set listener to wrapper that update text presentation of current address when each move
 	 * ended.
 	 */
+	@SuppressLint("MissingPermission")
 	private void setUpMap() {
 		if (googleMap == null)
 			return;
@@ -295,6 +298,7 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 						LocationSelectActivity.this, R.raw.google_map_style));
 		googleMap.setMaxZoomPreference(20);
 
+		//permission checked
 		if (hasGPSPermission())
 			googleMap.setMyLocationEnabled(true);
 
@@ -334,23 +338,37 @@ public class LocationSelectActivity extends AppCompatActivity implements OnMapRe
 	}
 
 	/**
-	 * Returns current position by GPS.
+	 * Returns current position by best available method.
 	 */
 	private LatLng getMyPosition() {
 		if (!hasGPSPermission()) return null;
 
-		String locationProvider = LocationManager.GPS_PROVIDER;
-		//permission checked above
-		@SuppressLint("MissingPermission") android.location.Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
-		double myLatitude = lastKnownLocation.getLatitude();
-		double myLongitude = lastKnownLocation.getLongitude();
+		List<String> providers = locationManager.getProviders(true);
+		Location bestLocation = null;
+		for (String provider : providers) {
+			//permission checked above
+			@SuppressLint("MissingPermission") Location loc = locationManager.getLastKnownLocation(provider);
+			if (loc == null) {
+				continue;
+			}
+			if (bestLocation == null || loc.getAccuracy() < bestLocation.getAccuracy()) {
+				bestLocation = loc;
+			}
+		}
+
+		double myLatitude = bestLocation.getLatitude();
+		double myLongitude = bestLocation.getLongitude();
 		return new LatLng(myLatitude, myLongitude);
 	}
 
 	/**
-	 * Checks if location permission granted.
+	 * Checks if GPS permission granted. Returns false if android version is too low
 	 */
 	private boolean hasGPSPermission() {
-		return (PackageManager.PERMISSION_GRANTED == checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			return (PackageManager.PERMISSION_GRANTED == checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+		} else {
+			return false;
+		}
 	}
 }

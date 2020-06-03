@@ -158,9 +158,13 @@
                         android:hint="@string/create_project_will_be_situated"
                         android:inputType="none"
                         android:paddingHorizontal="5dp"
-                        android:cursorVisible="false"/>
+                        android:cursorVisible="false" />
 
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp" />
 
             </LinearLayout>
 
