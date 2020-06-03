@@ -124,15 +124,18 @@ public class ProjectCardAdapter extends RecyclerView.Adapter<ProjectCardAdapter.
 
 			progressText.setText(ProjectEntry.getProgressString(project.donationsCollected, project.donationsGoal));
 
-			CloudHelper.loadImage(project.images.get(0), new CloudHelper.OnDownloadListener<Bitmap>() {
-				@Override
-				public void onComplete(Bitmap data) {
-					previewImage.setImageBitmap(data);
-				}
+			if (project.images.size() > 0) {
+				CloudHelper.loadImage(project.images.get(0), new CloudHelper.OnDownloadListener<Bitmap>() {
+					@Override
+					public void onComplete(Bitmap data) {
+						previewImage.setImageBitmap(data);
+					}
 
-				@Override
-				public void onCancel() {}
-			});
+					@Override
+					public void onCancel() {
+					}
+				});
+			}
 		}
 	}
 

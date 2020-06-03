@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.hypersphere.what.OnResultCallbackActivity;
 import com.hypersphere.what.R;
 import com.hypersphere.what.activities.LocationSelectActivity;
@@ -56,12 +58,12 @@ public class CreateProjectFragment extends Fragment {
 	private View mView;
 	private EditableGalleryRecyclerAdapter galleryAdapter;
 	private FloatingActionButton acceptButton;
-	private TextInputEditText locationInput;
-	private TextInputEditText titleInput;
-	private TextInputEditText descriptionInput;
-	private TextInputEditText moneyGoalInput;
-	private TextInputEditText moneyInvestInput;
-	private TextInputEditText moneyWalletInput;
+	private TextInputLayout locationInput;
+	private TextInputLayout titleInput;
+	private TextInputLayout descriptionInput;
+	private TextInputLayout moneyGoalInput;
+	private TextInputLayout moneyInvestInput;
+	private TextInputLayout moneyWalletInput;
 	private double longitude, latitude;
 
 	public CreateProjectFragment() {
@@ -86,12 +88,12 @@ public class CreateProjectFragment extends Fragment {
 		imageRecycler.setAdapter(galleryAdapter);
 
 		acceptButton = mView.findViewById(R.id.accept_button);
-		titleInput = mView.findViewById(R.id.title_edit_text);
-		descriptionInput = mView.findViewById(R.id.description_edit_text);
-		moneyGoalInput = mView.findViewById(R.id.money_goal_edit_text);
-		moneyInvestInput = mView.findViewById(R.id.money_investment_edit_text);
-		moneyWalletInput = mView.findViewById(R.id.money_wallet_edit_text);
-		locationInput = mView.findViewById(R.id.location_edit_text);
+		titleInput = mView.findViewById(R.id.title_edit_layout);
+		descriptionInput = mView.findViewById(R.id.description_edit_layout);
+		moneyGoalInput = mView.findViewById(R.id.money_goal_edit_layout);
+		moneyInvestInput = mView.findViewById(R.id.money_investment_edit_layout);
+		moneyWalletInput = mView.findViewById(R.id.money_wallet_edit_layout);
+		locationInput = mView.findViewById(R.id.location_edit_layout);
 		locationInput.setOnClickListener(v -> {
 			if (locationRequested)
 				return;
@@ -100,8 +102,8 @@ public class CreateProjectFragment extends Fragment {
 			locationInput.clearFocus();
 
 			Intent intent = new Intent(getActivity(), LocationSelectActivity.class);
-			if (locationInput.getText().length() > 0) {
-				intent.putExtra("lastAddress", locationInput.getText().toString());
+			if (locationInput.getEditText().getText().length() > 0) {
+				intent.putExtra("lastAddress", locationInput.getEditText().getText().toString());
 				intent.putExtra("lat", latitude);
 				intent.putExtra("lon", longitude);
 			}
@@ -118,52 +120,41 @@ public class CreateProjectFragment extends Fragment {
 						acceptButton.show();
 				});
 
-		mView.findViewById(R.id.accept_button).setOnClickListener(v -> {
-			ProjectEntry project = new ProjectEntry(
-					"",
-					titleInput.getText().toString(),
-					descriptionInput.getText().toString(),
-					Double.parseDouble(moneyGoalInput.getText().toString()),
-					Double.parseDouble(moneyInvestInput.getText().toString()),
-					latitude,
-					longitude,
-					null,
-					CloudHelper.getCurUser().id,
-					moneyWalletInput.getText().toString()
-			);
+		View acceptButton = mView.findViewById(R.id.accept_button);
+		acceptButton.setOnClickListener(v -> {
+			if (isInputCorrect()) {
+				ProjectEntry project = new ProjectEntry(
+						"",
+						titleInput.getEditText().getText().toString(),
+						descriptionInput.getEditText().getText().toString(),
+						Double.parseDouble(moneyGoalInput.getEditText().getText().toString()),
+						Double.parseDouble(moneyInvestInput.getEditText().getText().toString()),
+						latitude,
+						longitude,
+						null,
+						CloudHelper.getCurUser().id,
+						moneyWalletInput.getEditText().getText().toString()
+				);
 
-			/*
-			final Dialog loadingDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent);
-			loadingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-			loadingDialog.setCancelable(false);
-			loadingDialog.setContentView(R.layout.loading_dialog_layout);
-			ImageView imageView = loadingDialog.findViewById(R.id.loading_image_view);
-			Glide.with(getContext())
-					.load(R.drawable.loading_drawable)
-					.placeholder(R.drawable.loading_drawable)
-					.fitCenter()
-					.into(imageView);
+				CloudHelper.newProject(project, galleryAdapter.getImages());
 
-			loadingDialog.show();
-			*/
-			CloudHelper.newProject(project, galleryAdapter.getImages());
+				MainActivity activity = (MainActivity) getActivity();
+				activity.smoothNavigateTo(MainActivity.MainFragmentsEnum.Map);
 
-			MainActivity activity = (MainActivity) getActivity();
-			activity.smoothNavigateTo(MainActivity.MainFragmentsEnum.Map);
-
-			clearFields();
+				clearFields();
+			}
 		});
 
 		//force to save state
 		setRetainInstance(true);
 		//restoring
 		if (savedInstanceState != null) {
-			titleInput.setText(savedInstanceState.getString("title"));
-			descriptionInput.setText(savedInstanceState.getString("description"));
-			moneyGoalInput.setText(savedInstanceState.getString("moneyGoal"));
-			moneyInvestInput.setText(savedInstanceState.getString("moneyInvest"));
-			moneyWalletInput.setText(savedInstanceState.getString("moneyWallet"));
-			locationInput.setText(savedInstanceState.getString("locationAddress"));
+			titleInput.getEditText().setText(savedInstanceState.getString("title"));
+			descriptionInput.getEditText().setText(savedInstanceState.getString("description"));
+			moneyGoalInput.getEditText().setText(savedInstanceState.getString("moneyGoal"));
+			moneyInvestInput.getEditText().setText(savedInstanceState.getString("moneyInvest"));
+			moneyWalletInput.getEditText().setText(savedInstanceState.getString("moneyWallet"));
+			locationInput.getEditText().setText(savedInstanceState.getString("locationAddress"));
 			latitude = savedInstanceState.getDouble("locationLatitude");
 			longitude = savedInstanceState.getDouble("locationLongitude");
 
@@ -175,19 +166,104 @@ public class CreateProjectFragment extends Fragment {
 			}
 		}
 
+		setInputErrorMessages();
+
 		return mView;
+	}
+
+	/**
+	 * Adds {@link android.widget.TextView.OnEditorActionListener} to input fields with
+	 * input-correctness check.
+	 */
+	private void setInputErrorMessages() {
+		//title check (>3 chars)
+		titleInput.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			if (titleInput.getEditText().getText().toString().isEmpty())
+				titleInput.setError(getString(R.string.create_error_at_least_3));
+			else
+				titleInput.setError(null);
+			return false;
+		});
+
+		//description can be empty (no checks)
+
+		//goal > invest
+		TextView.OnEditorActionListener moneyInputsChecker = (v, actionId, event) -> {
+			moneyInvestInput.setError(null);
+			moneyGoalInput.setError(null);
+
+			double investAmount = -1, goalAmount = -1;
+			try {
+				investAmount = Double.parseDouble(moneyInvestInput.getEditText().getText().toString());
+			} catch (NumberFormatException e) {
+				moneyInvestInput.setError(getString(R.string.create_error_fill_amount));
+			}
+			try {
+				goalAmount = Double.parseDouble(moneyGoalInput.getEditText().getText().toString());
+			} catch (NumberFormatException e) {
+				moneyGoalInput.setError(getString(R.string.create_error_fill_amount));
+			}
+
+			if (investAmount == -1 || goalAmount == -1)
+				return false;
+
+			if (goalAmount <= investAmount) {
+				moneyInvestInput.setError(getString(R.string.create_error_goal_bigger_invest));
+				moneyGoalInput.setError(getString(R.string.create_error_invest_smaller_goal));
+			}
+
+			return false;
+		};
+		moneyInvestInput.getEditText().setOnEditorActionListener(moneyInputsChecker);
+		moneyGoalInput.getEditText().setOnEditorActionListener(moneyInputsChecker);
+
+		//wallet id is 15 digits
+		moneyWalletInput.getEditText().setOnEditorActionListener((v, actionId, event) -> {
+			if (moneyWalletInput.getEditText().getText().length() != 15) {
+				moneyWalletInput.setError(getString(R.string.create_error_15_digits));
+			} else moneyWalletInput.setError(null);
+			return false;
+		});
+	}
+
+	/**
+	 * Checks is all fields of project is correct.
+	 * Firstly checks errors in text fields, then checks that location is entered and finally that
+	 * at gallery contains at least 1 image.
+	 *
+	 * @return
+	 */
+	private boolean isInputCorrect() {
+		boolean correct = true;
+
+		TextInputLayout[] textInputs = {titleInput, descriptionInput, moneyGoalInput, moneyInvestInput, moneyWalletInput};
+		for (TextInputLayout input : textInputs) {
+			if (input.getError() != null && !input.getError().toString().isEmpty()) correct = false;
+		}
+
+		//address don't entered
+		if (longitude == 0 || latitude == 0) {
+			locationInput.setError("Enter location");
+			correct = false;
+		}
+
+		if (galleryAdapter.getImages().size() == 0) {
+			Toast.makeText(getContext(), "You should add image", Toast.LENGTH_LONG).show();
+			correct = false;
+		}
+		return correct;
 	}
 
 	/**
 	 * Clears oll input data.
 	 */
 	private void clearFields() {
-		locationInput.setText("");
-		titleInput.setText("");
-		descriptionInput.setText("");
-		moneyGoalInput.setText("");
-		moneyInvestInput.setText("");
-		moneyWalletInput.setText("");
+		locationInput.getEditText().setText("");
+		titleInput.getEditText().setText("");
+		descriptionInput.getEditText().setText("");
+		moneyGoalInput.getEditText().setText("");
+		moneyInvestInput.getEditText().setText("");
+		moneyWalletInput.getEditText().setText("");
 		latitude = 0;
 		longitude = 0;
 	}
@@ -202,12 +278,12 @@ public class CreateProjectFragment extends Fragment {
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		outState.putString("title", titleInput.getText().toString());
-		outState.putString("description", descriptionInput.getText().toString());
-		outState.putString("moneyGoal", moneyGoalInput.getText().toString());
-		outState.putString("moneyInvest", moneyInvestInput.getText().toString());
-		outState.putString("moneyWallet", moneyWalletInput.getText().toString());
-		outState.putString("locationAddress", locationInput.getText().toString());
+		outState.putString("title", titleInput.getEditText().getText().toString());
+		outState.putString("description", descriptionInput.getEditText().getText().toString());
+		outState.putString("moneyGoal", moneyGoalInput.getEditText().getText().toString());
+		outState.putString("moneyInvest", moneyInvestInput.getEditText().getText().toString());
+		outState.putString("moneyWallet", moneyWalletInput.getEditText().getText().toString());
+		outState.putString("locationAddress", locationInput.getEditText().getText().toString());
 		outState.putDouble("locationLatitude", latitude);
 		outState.putDouble("locationLongitude", longitude);
 
@@ -220,7 +296,8 @@ public class CreateProjectFragment extends Fragment {
 	}
 
 	/**
-	 * Grabs result from {@link LocationSelectActivity}.
+	 * Grabs result from {@link LocationSelectActivity}. If location is gotten clears
+	 * locationInput's error.
 	 *
 	 * @param requestCode
 	 * @param resultCode
@@ -232,9 +309,10 @@ public class CreateProjectFragment extends Fragment {
 
 		if (requestCode == REQUEST_LOCATION) {
 			if (resultCode == Activity.RESULT_OK) {
-				locationInput.setText(data.getStringExtra("address"));
+				locationInput.getEditText().setText(data.getStringExtra("address"));
 				latitude = data.getDoubleExtra("lat", 0);
 				longitude = data.getDoubleExtra("lon", 0);
+				locationInput.setError(null);
 			}
 			locationRequested = false;
 		}

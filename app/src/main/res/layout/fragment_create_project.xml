@@ -41,12 +41,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/title_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:errorEnabled="true"
                     app:startIconDrawable="@drawable/ic_title_black_24dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/title_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -60,12 +61,12 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/description_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:startIconDrawable="@drawable/ic_subject_black_24dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/description_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -78,12 +79,13 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/money_goal_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/ic_monetization_on_black_24dp">
+                    app:errorEnabled="true"
+                    app:startIconDrawable="@drawable/ic_monetization_on_ruble_black_20dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/money_goal_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -91,18 +93,19 @@
                         android:hint="@string/create_enter_full_price_of_project"
                         android:inputType="numberDecimal"
                         android:maxLines="1"
-                        android:paddingHorizontal="5dp"/>
+                        android:paddingHorizontal="5dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/money_investment_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:startIconDrawable="@drawable/ic_attach_money_black_24dp">
+                    app:errorEnabled="true"
+                    app:startIconDrawable="@drawable/ic_attach_money_ruble_black_30dp">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/money_investment_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -110,12 +113,13 @@
                         android:hint="@string/create_enter_your_investment"
                         android:inputType="numberDecimal"
                         android:maxLines="1"
-                        android:paddingHorizontal="5dp"/>
+                        android:paddingHorizontal="5dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/money_wallet_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:startIconDrawable="@drawable/ic_account_balance_wallet_black_24dp"
@@ -123,7 +127,6 @@
                     app:counterEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/money_wallet_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -137,14 +140,15 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.What.TextInput.FilledBox"
+                    android:id="@+id/location_edit_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:startIconDrawable="@drawable/ic_location_on_black_24dp"
                     android:focusable="false"
-                    android:longClickable="false">
+                    android:longClickable="false"
+                    app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/location_edit_text"
                         style="@style/TextAppearance.MaterialComponents.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -157,10 +161,6 @@
                         android:cursorVisible="false"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp" />
 
             </LinearLayout>
 

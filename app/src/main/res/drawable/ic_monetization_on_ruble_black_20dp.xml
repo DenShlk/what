@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright 2020 Denis Shulakov
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+  ~ compliance with the License. You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License
+  ~ is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+  ~ or implied. See the License for the specific language governing permissions and limitations under
+  ~ the License.
+  -->
+
+<vector android:autoMirrored="true"
+    android:height="20dp"
+    android:viewportHeight="511.449"
+    android:viewportWidth="511.449"
+    android:width="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="m287.724,170.058h-53.667v64.667h53.667c17.828,0 32.333,-14.505 32.333,-32.333s-14.504,-32.334 -32.333,-32.334z" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="m436.508,74.941c-99.913,-99.913 -261.639,-99.928 -361.566,0 -99.914,99.912 -99.93,261.64 0,361.567 99.913,99.913 261.639,99.928 361.566,0 99.913,-99.912 99.929,-261.64 0,-361.567zM287.724,276.724h-53.667v22h43c11.598,0 21,9.402 21,21s-9.402,21 -21,21h-43v21.667c0,11.598 -9.402,21 -21,21s-21,-9.402 -21,-21v-21.667h-21.666c-11.598,0 -21,-9.402 -21,-21s9.402,-21 21,-21h21.666v-22h-21.666c-11.598,0 -21,-9.402 -21,-21s9.402,-21 21,-21h21.666v-85.667c0,-11.598 9.402,-21 21,-21h74.667c40.987,0 74.333,33.346 74.333,74.333 0,40.989 -33.345,74.334 -74.333,74.334z" />
+</vector>

@@ -67,6 +67,12 @@
     <string name="create_project_yandex_wallet_number">Project Yandex wallet number</string>
     <string name="create_project_will_be_situated">Project will be situated...</string>
     <string name="create_uploading">Uploading...</string>
+    <!--create fragment error text-->
+    <string name="create_error_at_least_3">At least 3 chars</string>
+    <string name="create_error_fill_amount">Fill amount</string>
+    <string name="create_error_goal_bigger_invest">Goal must be bigger than invest</string>
+    <string name="create_error_invest_smaller_goal">Invest must be smaller than goal</string>
+    <string name="create_error_15_digits">Number consists from 15 digits</string>
 
     <!--profile fragment-->
     <string name="profile_my_active_projects">My active projects:</string>
@@ -97,6 +103,6 @@
     <string name="redact_image_delete_image">Delete image</string>
 
     <!--change avatar dialog in profile fragment-->
-    <string name="profile_dialog_change_avatar">Change avatar</string>
+    <string name="profile_dialog_change_avatar">Change avatar</string>>
 
 </resources>
